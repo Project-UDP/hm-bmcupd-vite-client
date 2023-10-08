@@ -1,24 +1,33 @@
-import { useState } from "react";
-import ".././App.css";
-import { NavLink } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import { localStorageUtil } from "../utils/localStorageUtils";
-import { usePatient } from "../hooks/usePatient";
+import { useState } from 'react'
+import '.././App.css'
+import { NavLink } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
+import { localStorageUtil } from '../utils/localStorageUtils'
+import { usePatient } from '../hooks/usePatient'
 
 export const Navbar = (): JSX.Element => {
-  const [search, setSearch] = useState<string>("");
+  const [search, setSearch] = useState<string>('')
 
-  const { onLogout } = useAuth();
+  const { onLogout } = useAuth()
 
   const { loadPatients, filterParameters, currentPageNumber } = usePatient()
 
   const handleSearch = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
+    event.preventDefault()
     await loadPatients(filterParameters, currentPageNumber, search)
-  };
+  }
 
   return (
-    <nav className="navbar navbar-expand-xl navbar-light bg-light" style={{ background: "#3498db", boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)", top:"0", position:"sticky", zIndex: "300" }}>
+    <nav
+      className="navbar navbar-expand-xl navbar-light bg-light"
+      style={{
+        background: '#3498db',
+        boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.2)',
+        top: '0',
+        position: 'sticky',
+        zIndex: '300'
+      }}
+    >
       <div className="container-fluid">
         <button
           className="navbar-toggler"
@@ -39,11 +48,11 @@ export const Navbar = (): JSX.Element => {
             <li className="nav-item">
               <div className="nav-link active" aria-current="page">
                 <NavLink
-                  to={"/search"}
+                  to={'/search'}
                   style={{
-                    color: "black",
-                    fontFamily: "RobotoRegular, sans-serif",
-                    textDecoration: "none",
+                    color: 'black',
+                    fontFamily: 'RobotoRegular, sans-serif',
+                    textDecoration: 'none'
                   }}
                 >
                   Главная страница
@@ -53,10 +62,10 @@ export const Navbar = (): JSX.Element => {
             <li className="nav-item">
               <div className="nav-link">
                 <NavLink
-                  to={"/form"}
+                  to={'/form'}
                   style={{
-                    fontFamily: "RobotoRegular, sans-serif",
-                    textDecoration: "none",
+                    fontFamily: 'RobotoRegular, sans-serif',
+                    textDecoration: 'none'
                   }}
                 >
                   Добавить пациента
@@ -70,7 +79,7 @@ export const Navbar = (): JSX.Element => {
               type="search"
               placeholder="ФИО или ИИН"
               aria-label="Search"
-              style={{ width: "25rem", height: "3rem" }}
+              style={{ width: '25rem', height: '3rem' }}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
@@ -90,21 +99,23 @@ export const Navbar = (): JSX.Element => {
                 role="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
-                style={{ color: "black", fontSize: "20px" }}
+                style={{ color: 'black', fontSize: '20px' }}
               >
                 {(() => {
                   const user = localStorageUtil.user.get()
-                  return `${user?.secondname || ''} ${user?.firstname || ''} ${user?.patronymic || ''}`
+                  return `${user?.secondname || ''} ${user?.firstname || ''} ${
+                    user?.patronymic || ''
+                  }`
                 })()}
               </div>
               <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li>
                   <div className="dropdown-item">
                     <NavLink
-                      to={"/profile"}
+                      to={'/profile'}
                       style={{
-                        color: "black",
-                        textDecoration: "none",
+                        color: 'black',
+                        textDecoration: 'none'
                       }}
                     >
                       Профиль
@@ -112,10 +123,10 @@ export const Navbar = (): JSX.Element => {
                   </div>
                   <div className="dropdown-item">
                     <NavLink
-                      to={"/dashboard"}
+                      to={'/dashboard'}
                       style={{
-                        color: "black",
-                        textDecoration: "none",
+                        color: 'black',
+                        textDecoration: 'none'
                       }}
                     >
                       Статистика
@@ -123,10 +134,10 @@ export const Navbar = (): JSX.Element => {
                   </div>
                   <div className="dropdown-item">
                     <NavLink
-                      to={"/appointment"}
+                      to={'/appointment'}
                       style={{
-                        color: "black",
-                        textDecoration: "none",
+                        color: 'black',
+                        textDecoration: 'none'
                       }}
                     >
                       Приемы
@@ -147,5 +158,5 @@ export const Navbar = (): JSX.Element => {
         </div>
       </div>
     </nav>
-  );
-};
+  )
+}

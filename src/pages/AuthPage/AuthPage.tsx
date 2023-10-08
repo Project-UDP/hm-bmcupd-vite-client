@@ -1,35 +1,36 @@
-import { useState } from "react";
-import { useAuth } from "../../hooks/useAuth";
-import { Navigate } from "react-router-dom";
+import { useState } from 'react'
+import { useAuth } from '../../hooks/useAuth'
+import { Navigate } from 'react-router-dom'
 
 export const AuthPage = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
 
- const { onLogin, token } = useAuth();
+  const { onLogin, token } = useAuth()
 
   if (token) {
-    return <Navigate to="/search" replace />;
+    return <Navigate to="/search" replace />
   }
 
-  return ( //FIXME: auto-fill makes inputs obsolete
+  return (
+    //FIXME: auto-fill makes inputs obsolete
     <>
-          <div className="container d-flex justify-content-center align-items-center vh-100">
+      <div className="container d-flex justify-content-center align-items-center vh-100">
         <div
           className="authorization-box text-center p-4"
           style={{
-            fontSize: "17px",
-            border: "1px solid rgba(0,0,0,.08)",
-            boxSizing: "border-box",
-            borderRadius: "8px",
-            padding: "0 20px",
+            fontSize: '17px',
+            border: '1px solid rgba(0,0,0,.08)',
+            boxSizing: 'border-box',
+            borderRadius: '8px',
+            padding: '0 20px'
           }}
         >
           <h1 className="mb-4">
             <img
               className="col-md-auto mx-auto text-center"
               src="./bmcudp_logo.png"
-              style={{ textAlign: "center" }}
+              style={{ textAlign: 'center' }}
               alt=""
             />
           </h1>
@@ -60,7 +61,7 @@ export const AuthPage = () => {
             <button
               className="btn btn-primary"
               onClick={() => {
-                onLogin(username, password);
+                onLogin(username, password)
               }}
             >
               Авторизоваться
@@ -69,5 +70,5 @@ export const AuthPage = () => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}

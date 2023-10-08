@@ -1,5 +1,5 @@
 export const dateUtils = {
-    toHourMinute: () => {
-        return
-    }
+  toHourMinute: () => {
+    return
+  }
 }

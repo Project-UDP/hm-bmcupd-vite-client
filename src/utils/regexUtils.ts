@@ -1,5 +1,5 @@
 export const regexUtils = {
-    containsOnlyNumbers: (str: string) => {
-        return /^\d+$/.test(str);
-    }
+  containsOnlyNumbers: (str: string) => {
+    return /^\d+$/.test(str)
+  }
 }

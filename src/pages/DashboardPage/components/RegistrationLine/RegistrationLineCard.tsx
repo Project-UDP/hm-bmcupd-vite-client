@@ -1,10 +1,10 @@
-import { RegistrationLine } from "./RegistrationLine";
+import { RegistrationLine } from './RegistrationLine'
 
-export const RegistrationLineCard = () => { //TODO: put year here
+export const RegistrationLineCard = () => {
+  //TODO: put year here
   return (
     <>
       <RegistrationLine />
     </>
-  );
-};
-
+  )
+}

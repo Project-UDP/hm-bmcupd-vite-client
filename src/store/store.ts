@@ -1,16 +1,21 @@
-import { combineReducers, configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
-import { setupListeners } from "@reduxjs/toolkit/query";
+import {
+  combineReducers,
+  configureStore,
+  getDefaultMiddleware
+} from '@reduxjs/toolkit'
+import { setupListeners } from '@reduxjs/toolkit/query'
 import userReducer from './slices/userSlice'
-import { postApi } from "../services/postService";
+import { postApi } from '../services/postService'
 
 const rootReducer = combineReducers({
-    userReducer,
-    [postApi.reducerPath]: postApi.reducer
+  userReducer,
+  [postApi.reducerPath]: postApi.reducer
 })
 
 export const store = configureStore({
-    reducer: rootReducer ,
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(postApi.middleware)
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(postApi.middleware)
 })
 
 setupListeners(store.dispatch)

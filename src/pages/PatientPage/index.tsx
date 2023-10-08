@@ -1,49 +1,47 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { Patient } from "../../types/Patient";
-import { Multioption } from "../../types/Multioption";
-import { useState } from "react";
+import { useLocation, useNavigate } from 'react-router-dom'
+import { Patient } from '../../types/Patient'
+import { Multioption } from '../../types/Multioption'
+import { useState } from 'react'
 
 export const PatientPage = (): JSX.Element => {
+  const { state } = useLocation()
+  const patient: Patient = state
 
-  const { state } = useLocation();
-  const patient: Patient = state;
-  //type Key = keyof typeof patient
   let key: keyof typeof patient
   for (key in patient) {
-    //(iterator as unknown) as keyof Patient
-    let value = patient[key];
+    let value = patient[key]
 
-      if (
-        typeof value === "string" &&
-        (value.startsWith('{"child"') || value.startsWith('{"value"'))
-      ) {
-        //@ts-ignore
-        patient[key] = JSON.parse(value);
-      } 
+    if (
+      typeof value === 'string' &&
+      (value.startsWith('{"child"') || value.startsWith('{"value"'))
+    ) {
+      //@ts-ignore
+      patient[key] = JSON.parse(value)
+    }
   }
 
   const removePrefixDrugoe = (value: string) => {
-    if (value.startsWith("Другое")) {
+    if (value.startsWith('Другое')) {
       return value.slice(6)
     }
-    return value;
-  };
+    return value
+  }
 
-  const [activeTab, setActiveTab] = useState("0");
+  const [activeTab, setActiveTab] = useState('0')
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const handleFormChange = (event: React.MouseEvent<HTMLDivElement>) => {
-    setActiveTab(event.currentTarget.id);
-  };
+    setActiveTab(event.currentTarget.id)
+  }
 
   const handleRedirectPatientUpdate = () => {
-    navigate("/form", { state: { state } });
-  };
+    navigate('/form', { state: { state } })
+  }
 
   const pdfJSX = () => (
     <>
-    <h1>Hello World!</h1>
+      <h1>Hello World!</h1>
     </>
   )
 
@@ -56,13 +54,15 @@ export const PatientPage = (): JSX.Element => {
         >
           Изменить данные
         </button>
-        <p style={{ display: 'inline-block' }}>Последний изменено - {patient.lastEditingUser}</p>
-        <ul className="nav nav-tabs" style={{ marginBottom: "1rem" }}>
+        <p style={{ display: 'inline-block' }}>
+          Последний изменено - {patient.lastEditingUser}
+        </p>
+        <ul className="nav nav-tabs" style={{ marginBottom: '1rem' }}>
           <li className="nav-item">
             <div
               id="0"
               onClick={handleFormChange}
-              className={activeTab === "0" ? "nav-link active" : "nav-link"}
+              className={activeTab === '0' ? 'nav-link active' : 'nav-link'}
               aria-current="page"
             >
               Данные пациента
@@ -72,7 +72,7 @@ export const PatientPage = (): JSX.Element => {
             <div
               id="1"
               onClick={handleFormChange}
-              className={activeTab === "1" ? "nav-link active" : "nav-link"}
+              className={activeTab === '1' ? 'nav-link active' : 'nav-link'}
               aria-current="page"
             >
               Перинатальный анамнез
@@ -82,7 +82,7 @@ export const PatientPage = (): JSX.Element => {
             <div
               id="2"
               onClick={handleFormChange}
-              className={activeTab === "2" ? "nav-link active" : "nav-link"}
+              className={activeTab === '2' ? 'nav-link active' : 'nav-link'}
               aria-current="page"
             >
               Анамнез эпилепсии
@@ -92,7 +92,7 @@ export const PatientPage = (): JSX.Element => {
             <div
               id="3"
               onClick={handleFormChange}
-              className={activeTab === "3" ? "nav-link active" : "nav-link"}
+              className={activeTab === '3' ? 'nav-link active' : 'nav-link'}
               aria-current="page"
             >
               Фактическая ситуация
@@ -102,7 +102,7 @@ export const PatientPage = (): JSX.Element => {
             <div
               id="4"
               onClick={handleFormChange}
-              className={activeTab === "4" ? "nav-link active" : "nav-link"}
+              className={activeTab === '4' ? 'nav-link active' : 'nav-link'}
               aria-current="page"
             >
               Противосудорожные препараты (ПСП)
@@ -112,7 +112,7 @@ export const PatientPage = (): JSX.Element => {
             <div
               id="5"
               onClick={handleFormChange}
-              className={activeTab === "5" ? "nav-link active" : "nav-link"}
+              className={activeTab === '5' ? 'nav-link active' : 'nav-link'}
               aria-current="page"
             >
               Инструментальное исследование
@@ -122,7 +122,7 @@ export const PatientPage = (): JSX.Element => {
             <div
               id="6"
               onClick={handleFormChange}
-              className={activeTab === "6" ? "nav-link active" : "nav-link"}
+              className={activeTab === '6' ? 'nav-link active' : 'nav-link'}
               aria-current="page"
             >
               Результат МРТ
@@ -132,7 +132,7 @@ export const PatientPage = (): JSX.Element => {
             <div
               id="7"
               onClick={handleFormChange}
-              className={activeTab === "7" ? "nav-link active" : "nav-link"}
+              className={activeTab === '7' ? 'nav-link active' : 'nav-link'}
               aria-current="page"
             >
               ПЭТ КТ результат
@@ -140,21 +140,21 @@ export const PatientPage = (): JSX.Element => {
           </li>
         </ul>
 
-        {activeTab === "0" && (
+        {activeTab === '0' && (
           <div
             className="container"
             style={{
-              fontSize: "17px",
-              border: "1px solid rgba(0,0,0,.08)",
-              boxSizing: "border-box",
-              borderRadius: "8px",
-              padding: "0 20px",
+              fontSize: '17px',
+              border: '1px solid rgba(0,0,0,.08)',
+              boxSizing: 'border-box',
+              borderRadius: '8px',
+              padding: '0 20px'
             }}
           >
-            <h3 style={{ textAlign: "center" }}>Паспортные данные пациента</h3>
+            <h3 style={{ textAlign: 'center' }}>Паспортные данные пациента</h3>
             <div
               className="row"
-              style={{ borderBottom: "1px solid rgba(0,0,0,.08)" }}
+              style={{ borderBottom: '1px solid rgba(0,0,0,.08)' }}
             >
               <div className="col-sm my-2">
                 <strong>Регистрационный № документа - </strong>
@@ -168,9 +168,9 @@ export const PatientPage = (): JSX.Element => {
 
             <div
               className="col-sm mt-3 pb-2"
-              style={{ borderBottom: "1px solid rgba(0,0,0,.08)" }}
+              style={{ borderBottom: '1px solid rgba(0,0,0,.08)' }}
             >
-              <h5 style={{ textAlign: "left" }}>ДАННЫЕ ПАЦИЕНТА</h5>
+              <h5 style={{ textAlign: 'left' }}>ДАННЫЕ ПАЦИЕНТА</h5>
               <div className="col-sm ms-2">
                 <div className="row">
                   <div className="col-sm-7">
@@ -202,7 +202,7 @@ export const PatientPage = (): JSX.Element => {
                     <div className="row">
                       <div className="col-md-auto">
                         <strong>Пол - </strong>
-                        {patient.isMale ? "Мужчина" : "Женщина"}
+                        {patient.isMale ? 'Мужчина' : 'Женщина'}
                       </div>
                     </div>
                   </div>
@@ -212,7 +212,7 @@ export const PatientPage = (): JSX.Element => {
 
             <div
               className="col-sm mt-3 pb-2"
-              style={{ borderBottom: "1px solid rgba(0,0,0,.08)" }}
+              style={{ borderBottom: '1px solid rgba(0,0,0,.08)' }}
             >
               <strong>Адрес проживания:</strong>
               <div className="col-sm ms-2">
@@ -242,7 +242,7 @@ export const PatientPage = (): JSX.Element => {
 
             <div
               className="col-sm mt-3 pb-2"
-              style={{ borderBottom: "1px solid rgba(0,0,0,.08)" }}
+              style={{ borderBottom: '1px solid rgba(0,0,0,.08)' }}
             >
               <strong>Контактный телефон: </strong>
               <div className="col-sm ms-2">
@@ -256,14 +256,14 @@ export const PatientPage = (): JSX.Element => {
 
             <div
               className="col-sm mt-3 pb-2"
-              style={{ borderBottom: "1px solid rgba(0,0,0,.08)" }}
+              style={{ borderBottom: '1px solid rgba(0,0,0,.08)' }}
             >
               <strong>Доминантная рука: </strong>
               <div className="col-sm ms-2">
                 <div className="row">
                   <div className="col-sm ms-2">
                     <div className="col-md-auto">
-                      {patient.isRightHanded ? "Правая" : "Левая"}
+                      {patient.isRightHanded ? 'Правая' : 'Левая'}
                     </div>
                   </div>
                 </div>
@@ -273,14 +273,14 @@ export const PatientPage = (): JSX.Element => {
             <div
               className="d-flex mt-3 pb-2"
               style={{
-                borderBottom: "1px solid rgba(0,0,0,.08)",
+                borderBottom: '1px solid rgba(0,0,0,.08)'
               }}
             >
               <div>
                 <div
                   className="pb-2"
                   style={{
-                    borderBottom: "1px solid rgba(0,0,0,.08)",
+                    borderBottom: '1px solid rgba(0,0,0,.08)'
                   }}
                 >
                   <div className="flex-row">
@@ -289,7 +289,9 @@ export const PatientPage = (): JSX.Element => {
                   </div>
                   <div className="flex-row">
                     <strong>Национальсность - </strong>
-                    {patient.nationality ? removePrefixDrugoe(patient.nationality) : '' }
+                    {patient.nationality
+                      ? removePrefixDrugoe(patient.nationality)
+                      : ''}
                   </div>
                   <div className="flex-row">
                     <strong>Семейное положение - </strong>
@@ -304,12 +306,12 @@ export const PatientPage = (): JSX.Element => {
                     {patient.workStatus}
                   </div>
                   <div className="flex-row">
-                    <strong>Диспансерный учет (дата учета) -</strong>{" "}
+                    <strong>Диспансерный учет (дата учета) -</strong>{' '}
                     {patient.dispensaryRegistration?.toString()}
                   </div>
                   <div className="flex-row">
                     <strong>Вождение автомобиля - </strong>
-                    {patient.isDriver ? "Да" : "Нет"}
+                    {patient.isDriver ? 'Да' : 'Нет'}
                   </div>
                 </div>
               </div>
@@ -317,46 +319,48 @@ export const PatientPage = (): JSX.Element => {
           </div>
         )}
 
-        {activeTab === "1" && (
+        {activeTab === '1' && (
           <div
             className="container"
             style={{
-              fontSize: "17px",
-              border: "1px solid rgba(0,0,0,.08)",
-              boxSizing: "border-box",
-              borderRadius: "8px",
-              padding: "0 20px",
+              fontSize: '17px',
+              border: '1px solid rgba(0,0,0,.08)',
+              boxSizing: 'border-box',
+              borderRadius: '8px',
+              padding: '0 20px'
             }}
           >
-            <h3 style={{ textAlign: "center" }}>Перинатальный анамнез</h3>
+            <h3 style={{ textAlign: 'center' }}>Перинатальный анамнез</h3>
 
             <div
               className="d-flex mt-3 pb-2"
               style={{
-                borderBottom: "1px solid rgba(0,0,0,.08)",
+                borderBottom: '1px solid rgba(0,0,0,.08)'
               }}
             >
               <div>
                 <div
                   className="pb-2"
                   style={{
-                    borderBottom: "1px solid rgba(0,0,0,.08)",
+                    borderBottom: '1px solid rgba(0,0,0,.08)'
                   }}
                 >
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Ребенок по счету: </strong>
                     {patient.childCount}
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>
                       Особенности течение беременности матери (антенатальный
                       период):
                     </strong>
-                      {<RecursiveMultioptionDisplay
+                    {
+                      <RecursiveMultioptionDisplay
                         data={patient.pregnancyFeatures as Multioption}
-                      />}
+                      />
+                    }
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Особенности родов (интранатальный период):</strong>
                     {
                       <RecursiveMultioptionDisplay
@@ -364,7 +368,7 @@ export const PatientPage = (): JSX.Element => {
                       />
                     }
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>
                       Особенности после родов (постнатальный период):
                     </strong>
@@ -374,7 +378,7 @@ export const PatientPage = (): JSX.Element => {
                       />
                     }
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Ранее развитие (Формула развития ребенка):</strong>
                     {patient.childEarlyDevelopment}
                   </div>
@@ -384,40 +388,42 @@ export const PatientPage = (): JSX.Element => {
           </div>
         )}
 
-        {activeTab === "2" && (
+        {activeTab === '2' && (
           <div
             className="container"
             style={{
-              fontSize: "17px",
-              border: "1px solid rgba(0,0,0,.08)",
-              boxSizing: "border-box",
-              borderRadius: "8px",
-              padding: "0 20px",
+              fontSize: '17px',
+              border: '1px solid rgba(0,0,0,.08)',
+              boxSizing: 'border-box',
+              borderRadius: '8px',
+              padding: '0 20px'
             }}
           >
-            <h3 style={{ textAlign: "center" }}>Анамнез эпилепсии</h3>
+            <h3 style={{ textAlign: 'center' }}>Анамнез эпилепсии</h3>
             <div
               className="d-flex mt-3 pb-2"
               style={{
-                borderBottom: "1px solid rgba(0,0,0,.08)",
+                borderBottom: '1px solid rgba(0,0,0,.08)'
               }}
             >
               <div>
                 <div
                   className="pb-2"
                   style={{
-                    borderBottom: "1px solid rgba(0,0,0,.08)",
+                    borderBottom: '1px solid rgba(0,0,0,.08)'
                   }}
                 >
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>ФС: </strong>
                     {patient.isFS}
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Нейроинфекция: </strong>
-                    {patient.neuroinfection ? removePrefixDrugoe(patient.neuroinfection) : ''}
+                    {patient.neuroinfection
+                      ? removePrefixDrugoe(patient.neuroinfection)
+                      : ''}
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Возраст первого приступа: </strong>
                     {
                       <RecursiveMultioptionDisplay
@@ -429,21 +435,21 @@ export const PatientPage = (): JSX.Element => {
               </div>
             </div>
 
-            <h5 style={{ textAlign: "center" }}>Типы приступов</h5>
+            <h5 style={{ textAlign: 'center' }}>Типы приступов</h5>
             <div
               className="d-flex mt-3 pb-2"
               style={{
-                borderBottom: "1px solid rgba(0,0,0,.08)",
+                borderBottom: '1px solid rgba(0,0,0,.08)'
               }}
             >
               <div>
                 <div
                   className="pb-2"
                   style={{
-                    borderBottom: "1px solid rgba(0,0,0,.08)",
+                    borderBottom: '1px solid rgba(0,0,0,.08)'
                   }}
                 >
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Неонатальный и младенческий возраст: </strong>
                     {
                       <RecursiveMultioptionDisplay
@@ -451,7 +457,7 @@ export const PatientPage = (): JSX.Element => {
                       />
                     }
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Детский и юношеский возраст: </strong>
                     {
                       <RecursiveMultioptionDisplay
@@ -459,7 +465,7 @@ export const PatientPage = (): JSX.Element => {
                       />
                     }
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Взрослый и пожилой возраст: </strong>
                     {
                       <RecursiveMultioptionDisplay
@@ -471,21 +477,21 @@ export const PatientPage = (): JSX.Element => {
               </div>
             </div>
 
-            <h5 style={{ textAlign: "center" }}>Эпилептический статус (ЭС)</h5>
+            <h5 style={{ textAlign: 'center' }}>Эпилептический статус (ЭС)</h5>
             <div
               className="d-flex mt-3 pb-2"
               style={{
-                borderBottom: "1px solid rgba(0,0,0,.08)",
+                borderBottom: '1px solid rgba(0,0,0,.08)'
               }}
             >
               <div>
                 <div
                   className="pb-2"
                   style={{
-                    borderBottom: "1px solid rgba(0,0,0,.08)",
+                    borderBottom: '1px solid rgba(0,0,0,.08)'
                   }}
                 >
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>С выраженными двигательными симптомами: </strong>
                     {
                       <RecursiveMultioptionDisplay
@@ -493,10 +499,10 @@ export const PatientPage = (): JSX.Element => {
                       />
                     }
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>
                       Без выраженной двигательной симптоматики (без судорожный
-                      ЭС):{" "}
+                      ЭС):{' '}
                     </strong>
                     {
                       <RecursiveMultioptionDisplay
@@ -510,32 +516,32 @@ export const PatientPage = (): JSX.Element => {
           </div>
         )}
 
-        {activeTab === "3" && (
+        {activeTab === '3' && (
           <div
             className="container"
             style={{
-              fontSize: "17px",
-              border: "1px solid rgba(0,0,0,.08)",
-              boxSizing: "border-box",
-              borderRadius: "8px",
-              padding: "0 20px",
+              fontSize: '17px',
+              border: '1px solid rgba(0,0,0,.08)',
+              boxSizing: 'border-box',
+              borderRadius: '8px',
+              padding: '0 20px'
             }}
           >
-            <h3 style={{ textAlign: "center" }}>Фактическая ситуация</h3>
+            <h3 style={{ textAlign: 'center' }}>Фактическая ситуация</h3>
             <div
               className="d-flex mt-3 pb-2"
               style={{
-                borderBottom: "1px solid rgba(0,0,0,.08)",
+                borderBottom: '1px solid rgba(0,0,0,.08)'
               }}
             >
               <div>
                 <div
                   className="pb-2"
                   style={{
-                    borderBottom: "1px solid rgba(0,0,0,.08)",
+                    borderBottom: '1px solid rgba(0,0,0,.08)'
                   }}
                 >
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Взрослый и пожилой возраст: </strong>
                     {
                       <RecursiveMultioptionDisplay
@@ -552,29 +558,29 @@ export const PatientPage = (): JSX.Element => {
             <div
               className="d-flex mt-3 pb-2"
               style={{
-                borderBottom: "1px solid rgba(0,0,0,.08)",
+                borderBottom: '1px solid rgba(0,0,0,.08)'
               }}
             >
               <div>
                 <div
                   className="pb-2"
                   style={{
-                    borderBottom: "1px solid rgba(0,0,0,.08)",
+                    borderBottom: '1px solid rgba(0,0,0,.08)'
                   }}
                 >
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Тип эпилепсий: </strong>
                     {patient.epilepsyType}
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>МКБ-10: </strong>
                     {patient.icd ? removePrefixDrugoe(patient.icd) : ''}
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Длительность приступа: </strong>
                     {patient.durationOfTheAttack}
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Особенности приступов:</strong>
                     {
                       <RecursiveMultioptionDisplay
@@ -588,45 +594,51 @@ export const PatientPage = (): JSX.Element => {
           </div>
         )}
 
-        {activeTab === "4" && (
+        {activeTab === '4' && (
           <div
             className="container"
             style={{
-              fontSize: "17px",
-              border: "1px solid rgba(0,0,0,.08)",
-              boxSizing: "border-box",
-              borderRadius: "8px",
-              padding: "0 20px",
+              fontSize: '17px',
+              border: '1px solid rgba(0,0,0,.08)',
+              boxSizing: 'border-box',
+              borderRadius: '8px',
+              padding: '0 20px'
             }}
           >
-            <h3 style={{ textAlign: "center" }}>
+            <h3 style={{ textAlign: 'center' }}>
               Противосудорожные препараты (ПСП)
             </h3>
 
             <div
               className="d-flex mt-3 pb-2"
               style={{
-                borderBottom: "1px solid rgba(0,0,0,.08)",
+                borderBottom: '1px solid rgba(0,0,0,.08)'
               }}
             >
               <div>
                 <div
                   className="pb-2"
                   style={{
-                    borderBottom: "1px solid rgba(0,0,0,.08)",
+                    borderBottom: '1px solid rgba(0,0,0,.08)'
                   }}
                 >
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>В дебюте: </strong>
-                    {patient.inTheDebut ? removePrefixDrugoe(patient.inTheDebut) : ''}
+                    {patient.inTheDebut
+                      ? removePrefixDrugoe(patient.inTheDebut)
+                      : ''}
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Последующая терапия: </strong>
-                    {patient.followUpTherapy ? removePrefixDrugoe(patient.followUpTherapy) : ''}
+                    {patient.followUpTherapy
+                      ? removePrefixDrugoe(patient.followUpTherapy)
+                      : ''}
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Текущая терапия: </strong>
-                    {patient.currentTherapy ? removePrefixDrugoe(patient.currentTherapy) : ''}
+                    {patient.currentTherapy
+                      ? removePrefixDrugoe(patient.currentTherapy)
+                      : ''}
                   </div>
                 </div>
               </div>
@@ -635,21 +647,21 @@ export const PatientPage = (): JSX.Element => {
             <div
               className="d-flex mt-3 pb-2"
               style={{
-                borderBottom: "1px solid rgba(0,0,0,.08)",
+                borderBottom: '1px solid rgba(0,0,0,.08)'
               }}
             >
               <div>
                 <div
                   className="pb-2"
                   style={{
-                    borderBottom: "1px solid rgba(0,0,0,.08)",
+                    borderBottom: '1px solid rgba(0,0,0,.08)'
                   }}
                 >
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Типы лечения: </strong>
                     {patient.healTypes}
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Оценка эффективности: </strong>
                     {patient.effectivenessGrade}
                   </div>
@@ -659,39 +671,39 @@ export const PatientPage = (): JSX.Element => {
           </div>
         )}
 
-        {activeTab === "5" && (
+        {activeTab === '5' && (
           <div
             className="container"
             style={{
-              fontSize: "17px",
-              border: "1px solid rgba(0,0,0,.08)",
-              boxSizing: "border-box",
-              borderRadius: "8px",
-              padding: "0 20px",
+              fontSize: '17px',
+              border: '1px solid rgba(0,0,0,.08)',
+              boxSizing: 'border-box',
+              borderRadius: '8px',
+              padding: '0 20px'
             }}
           >
-            <h3 style={{ textAlign: "center" }}>
+            <h3 style={{ textAlign: 'center' }}>
               Инструментальное исследование
             </h3>
 
             <div
               className="d-flex mt-3 pb-2"
               style={{
-                borderBottom: "1px solid rgba(0,0,0,.08)",
+                borderBottom: '1px solid rgba(0,0,0,.08)'
               }}
             >
               <div>
                 <div
                   className="pb-2"
                   style={{
-                    borderBottom: "1px solid rgba(0,0,0,.08)",
+                    borderBottom: '1px solid rgba(0,0,0,.08)'
                   }}
                 >
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Виды ЭЭГ: </strong>
                     {patient.typesOfEEG}
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Результат интериктального ЭЭГ: </strong>
                     {
                       <RecursiveMultioptionDisplay
@@ -703,22 +715,22 @@ export const PatientPage = (): JSX.Element => {
               </div>
             </div>
 
-            <h5 style={{ textAlign: "center" }}>Распространённость</h5>
+            <h5 style={{ textAlign: 'center' }}>Распространённость</h5>
 
             <div
               className="d-flex mt-3 pb-2"
               style={{
-                borderBottom: "1px solid rgba(0,0,0,.08)",
+                borderBottom: '1px solid rgba(0,0,0,.08)'
               }}
             >
               <div>
                 <div
                   className="pb-2"
                   style={{
-                    borderBottom: "1px solid rgba(0,0,0,.08)",
+                    borderBottom: '1px solid rgba(0,0,0,.08)'
                   }}
                 >
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Результат иктального ЭЭГ: </strong>
                     {
                       <RecursiveMultioptionDisplay
@@ -728,7 +740,7 @@ export const PatientPage = (): JSX.Element => {
                       />
                     }
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Локализация: </strong>
                     {
                       <RecursiveMultioptionDisplay
@@ -736,11 +748,11 @@ export const PatientPage = (): JSX.Element => {
                       />
                     }
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Типы: </strong>
                     {patient.types}
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Латерализация: </strong>
                     {patient.lateralization}
                   </div>
@@ -750,33 +762,33 @@ export const PatientPage = (): JSX.Element => {
           </div>
         )}
 
-        {activeTab === "6" && (
+        {activeTab === '6' && (
           <div
             className="container"
             style={{
-              fontSize: "17px",
-              border: "1px solid rgba(0,0,0,.08)",
-              boxSizing: "border-box",
-              borderRadius: "8px",
-              padding: "0 20px",
+              fontSize: '17px',
+              border: '1px solid rgba(0,0,0,.08)',
+              boxSizing: 'border-box',
+              borderRadius: '8px',
+              padding: '0 20px'
             }}
           >
-            <h3 style={{ textAlign: "center" }}>Результат МРТ</h3>
+            <h3 style={{ textAlign: 'center' }}>Результат МРТ</h3>
 
             <div
               className="d-flex mt-3 pb-2"
               style={{
-                borderBottom: "1px solid rgba(0,0,0,.08)",
+                borderBottom: '1px solid rgba(0,0,0,.08)'
               }}
             >
               <div>
                 <div
                   className="pb-2"
                   style={{
-                    borderBottom: "1px solid rgba(0,0,0,.08)",
+                    borderBottom: '1px solid rgba(0,0,0,.08)'
                   }}
                 >
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Локализация: </strong>
                     {
                       <RecursiveMultioptionDisplay
@@ -784,11 +796,11 @@ export const PatientPage = (): JSX.Element => {
                       />
                     }
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Латерализация: </strong>
                     {patient.lateralizationMRI}
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Диагноз по МРТ: </strong>
                     {
                       <RecursiveMultioptionDisplay
@@ -802,33 +814,33 @@ export const PatientPage = (): JSX.Element => {
           </div>
         )}
 
-        {activeTab === "7" && (
+        {activeTab === '7' && (
           <div
             className="container"
             style={{
-              fontSize: "17px",
-              border: "1px solid rgba(0,0,0,.08)",
-              boxSizing: "border-box",
-              borderRadius: "8px",
-              padding: "0 20px",
+              fontSize: '17px',
+              border: '1px solid rgba(0,0,0,.08)',
+              boxSizing: 'border-box',
+              borderRadius: '8px',
+              padding: '0 20px'
             }}
           >
-            <h3 style={{ textAlign: "center" }}>ПЭТ КТ результат</h3>
+            <h3 style={{ textAlign: 'center' }}>ПЭТ КТ результат</h3>
 
             <div
               className="d-flex mt-3 pb-2"
               style={{
-                borderBottom: "1px solid rgba(0,0,0,.08)",
+                borderBottom: '1px solid rgba(0,0,0,.08)'
               }}
             >
               <div>
                 <div
                   className="pb-2"
                   style={{
-                    borderBottom: "1px solid rgba(0,0,0,.08)",
+                    borderBottom: '1px solid rgba(0,0,0,.08)'
                   }}
                 >
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Локализация: </strong>
                     {
                       <RecursiveMultioptionDisplay
@@ -836,11 +848,11 @@ export const PatientPage = (): JSX.Element => {
                       />
                     }
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Латерализация: </strong>
                     {patient.lateralizationPETCT}
                   </div>
-                  <div className="flex-row" style={{ marginBottom: "10px" }}>
+                  <div className="flex-row" style={{ marginBottom: '10px' }}>
                     <strong>Заключение: </strong>
                     {patient.resultPETCT}
                   </div>
@@ -851,11 +863,11 @@ export const PatientPage = (): JSX.Element => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
 interface RProps {
-  data: Multioption | Multioption[];
+  data: Multioption | Multioption[]
 }
 
 const RecursiveMultioptionDisplay = ({ data }: RProps): JSX.Element => {
@@ -868,24 +880,28 @@ const RecursiveMultioptionDisplay = ({ data }: RProps): JSX.Element => {
       <>
         {data.map((multioption: Multioption) => {
           return (
-            <div style={{ marginLeft: "30px" }}>
-              <li>{multioption.value === 'Выберите' ? 'Не указан' : multioption.value}</li>
+            <div style={{ marginLeft: '30px' }}>
+              <li>
+                {multioption.value === 'Выберите'
+                  ? 'Не указан'
+                  : multioption.value}
+              </li>
               {multioption.child && (
                 <RecursiveMultioptionDisplay data={multioption.child} />
               )}
             </div>
-          );
+          )
         })}
       </>
-    );
+    )
   }
 
-  if (!data.value) return <></>;
+  if (!data.value) return <></>
 
   return (
-    <div style={{ marginLeft: "30px" }}>
-      <li>{data.value === 'Выберите' ? 'Не указан' : data.value}</li> 
+    <div style={{ marginLeft: '30px' }}>
+      <li>{data.value === 'Выберите' ? 'Не указан' : data.value}</li>
       {data.child && <RecursiveMultioptionDisplay data={data.child} />}
     </div>
-  );
-};
+  )
+}

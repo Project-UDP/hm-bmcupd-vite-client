@@ -1,21 +1,21 @@
 export interface User {
-  id?: number;
+  id?: number
 
-  username: string;
+  username: string
 
-  password?: string;
+  password?: string
 
-  firstname: string;
+  firstname: string
 
-  secondname: string;
+  secondname: string
 
-  patronymic: string;
+  patronymic: string
 
-  phoneNumber: string;
+  phoneNumber: string
 
-  birthDate: string;
+  birthDate: string
 
-  speciality: string;
+  speciality: string
 
-  role: string;
+  role: string
 }

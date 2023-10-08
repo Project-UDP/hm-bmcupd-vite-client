@@ -1,28 +1,28 @@
-import { User } from "../types/User";
+import { User } from '../types/User'
 
-const TOKEN_ENTRY = "hm-bmcudp-token";
-const FULLNAME_ENTRY = "hm-bmcudp-fullname";
-const USER_ENTRY = "hm-bmcudp-user";
+const TOKEN_ENTRY = 'hm-bmcudp-token'
+const FULLNAME_ENTRY = 'hm-bmcudp-fullname'
+const USER_ENTRY = 'hm-bmcudp-user'
 
 export const setStorage = (entry: string, value: string) => {
-  localStorage.setItem(entry, value);
-};
+  localStorage.setItem(entry, value)
+}
 
 export const getStorage = (entry: string): string => {
-  const value = localStorage.getItem(entry);
+  const value = localStorage.getItem(entry)
   if (
     entry === TOKEN_ENTRY &&
     value === null &&
-    window.location.pathname !== "/login"
+    window.location.pathname !== '/login'
   ) {
-    window.location.replace("login");
+    window.location.replace('login')
   }
-  return value ? value : "";
-};
+  return value ? value : ''
+}
 
 export const removeStorage = (entry: string) => {
-  localStorage.removeItem(entry);
-};
+  localStorage.removeItem(entry)
+}
 
 export const localStorageUtil = {
   user: {

@@ -1,96 +1,96 @@
-import { Patient } from "../../../types/Patient";
-import { Multioption } from "../../../types/Multioption";
+import { Patient } from '../../../types/Patient'
+import { Multioption } from '../../../types/Multioption'
 
 interface Props {
-  formData: Patient;
-  handleInput: any;
-  formFields: FormField[];
+  formData: Patient
+  handleInput: any
+  formFields: FormField[]
 }
 
 export interface FormField {
-  name: string;
-  label: string;
-  type: string;
-  options?: Option[];
+  name: string
+  label: string
+  type: string
+  options?: Option[]
   boxes?: {
-    name: string;
-    label: string;
-  }[];
+    name: string
+    label: string
+  }[]
 }
 
 interface Option {
-  label: string;
-  value: string;
-  isCheckbox?: boolean;
-  isOther?: boolean;
-  options?: Option[];
+  label: string
+  value: string
+  isCheckbox?: boolean
+  isOther?: boolean
+  options?: Option[]
 }
 
 export const PatientDetailsForm = ({
   formData,
   handleInput,
-  formFields,
+  formFields
 }: Props): JSX.Element => {
   const handleMultioptionInput = (
     event: any,
     data: Multioption,
     dataArr?: Multioption[],
-    label?: string,
+    label?: string
   ) => {
-    if (event.target.type === "checkbox") {
+    if (event.target.type === 'checkbox') {
       if (event.target.checked) {
-        dataArr!.push({ value: label! });
+        dataArr!.push({ value: label! })
       } else {
         for (let i = 0; i < dataArr!.length; i++) {
           if (dataArr![i].value === label) {
-            dataArr!.splice(i, 1);
+            dataArr!.splice(i, 1)
           }
         }
       }
-      handleInput(event, data);
-      return;
+      handleInput(event, data)
+      return
     }
 
-    let newValue = event.target.value;
-    data.value = newValue;
-    data.child = undefined;
-    handleInput(event, data);
-  };
+    let newValue = event.target.value
+    data.value = newValue
+    data.child = undefined
+    handleInput(event, data)
+  }
 
   return (
     <>
       {formFields.map((field) => {
         switch (field.type) {
-          case "label":
+          case 'label':
             return (
               <div key={field.name} className="mb-3">
                 <h4>{field.label}</h4>
               </div>
-            );
-          case "options":
+            )
+          case 'options':
             const value = formData[
               field.name as keyof typeof formData
-            ] as string;
-            let parentValue = value;
-            let otherField = () => <></>;
+            ] as string
+            let parentValue = value
+            let otherField = () => <></>
             if (
-              typeof value !== "boolean" &&
-              typeof value === "string" &&
-              value.startsWith("Другое")
+              typeof value !== 'boolean' &&
+              typeof value === 'string' &&
+              value.startsWith('Другое')
             ) {
-              parentValue = value.slice(0, 6);
+              parentValue = value.slice(0, 6)
               otherField = () => (
                 <input
                   onChange={(event) => {
-                    event.target.value = "Другое" + event.target.value;
-                    handleInput(event);
+                    event.target.value = 'Другое' + event.target.value
+                    handleInput(event)
                   }}
                   type="text"
                   className="form-control"
                   id={field.name}
                   value={value.slice(6)}
                 />
-              );
+              )
             }
             return (
               <div key={field.name} className="mb-3">
@@ -114,17 +114,17 @@ export const PatientDetailsForm = ({
                       >
                         {option.label}
                       </option>
-                    );
+                    )
                   })}
                 </select>
-                <div style={{ marginTop: "10px" }}>{otherField()}</div>
+                <div style={{ marginTop: '10px' }}>{otherField()}</div>
               </div>
-            );
-          case "multioptions":
-            let suboption: Option | undefined;
+            )
+          case 'multioptions':
+            let suboption: Option | undefined
             let data = formData[
               field.name as keyof typeof formData
-            ] as Multioption;
+            ] as Multioption
             return (
               <>
                 <div key={field.name} className="mb-3">
@@ -141,7 +141,7 @@ export const PatientDetailsForm = ({
                     <option selected>Выберите</option>
                     {field.options?.map((option): any => {
                       if (option.options && data.value === option.value) {
-                        suboption = option;
+                        suboption = option
                       }
                       return (
                         <option
@@ -150,12 +150,12 @@ export const PatientDetailsForm = ({
                         >
                           {option.label}
                         </option>
-                      );
+                      )
                     })}
                   </select>
                 </div>
                 {suboption && (
-                  <div style={{ marginLeft: "2px" }} className="form-check">
+                  <div style={{ marginLeft: '2px' }} className="form-check">
                     <RecursiveOptions
                       id={field.name}
                       isCheckbox={suboption.isCheckbox!}
@@ -166,8 +166,8 @@ export const PatientDetailsForm = ({
                   </div>
                 )}
               </>
-            );
-          case "checkbox":
+            )
+          case 'checkbox':
             return (
               <div key={field.name}>
                 <label>{field.label}</label>
@@ -180,8 +180,8 @@ export const PatientDetailsForm = ({
                         id={field.name}
                         name={box.name}
                         onChange={handleInput}
-                        checked={
-                        (// @ts-ignore
+                        checked={// @ts-ignore
+                        (
                           formData[
                             field.name as keyof typeof formData
                           ] as Array<string | number>
@@ -191,23 +191,23 @@ export const PatientDetailsForm = ({
                         {box.label}
                       </label>
                     </div>
-                  );
+                  )
                 })}
               </div>
-            );
+            )
           default:
             const isRequired =
-              field.name === "iin" ||
-              field.name === "firstName" ||
-              field.name === "secondName" ||
-              field.name === "dateOfBirth" ||
-              field.name === "registrationNumber";
+              field.name === 'iin' ||
+              field.name === 'firstName' ||
+              field.name === 'secondName' ||
+              field.name === 'dateOfBirth' ||
+              field.name === 'registrationNumber'
             const isEmpty =
-              formData[field.name as keyof typeof formData] === "" ||
-              formData[field.name as keyof typeof formData] === null;
-            let style = {};
+              formData[field.name as keyof typeof formData] === '' ||
+              formData[field.name as keyof typeof formData] === null
+            let style = {}
             if (isRequired && isEmpty) {
-              style = { borderColor: "red" };
+              style = { borderColor: 'red' }
             }
             return (
               <div key={field.name} className="mb-3">
@@ -218,10 +218,10 @@ export const PatientDetailsForm = ({
                 {Object.keys(style).length !== 0 && (
                   <p
                     style={{
-                      display: "inline-block",
-                      marginLeft: "3px",
-                      fontSize: "12px",
-                      color: "red",
+                      display: 'inline-block',
+                      marginLeft: '3px',
+                      fontSize: '12px',
+                      color: 'red'
                     }}
                     className="form-label"
                   >
@@ -239,61 +239,61 @@ export const PatientDetailsForm = ({
                   }
                 />
               </div>
-            );
+            )
         }
       })}
     </>
-  );
-};
+  )
+}
 
 const isChecked = (data: Array<Multioption>, value: string): boolean => {
   for (let i = 0; i < data.length; i++) {
     if (data[i].value === value) {
-      return true;
+      return true
     }
   }
-  return false;
-};
+  return false
+}
 
 const retrieve = (data: Array<Multioption>, value: string): Multioption => {
   for (let i = 0; i < data.length; i++) {
     if (data[i].value === value) {
-      return data[i];
+      return data[i]
     }
   }
-  return { value: "FIXXX" }; //FIXME:
-};
+  return { value: 'FIXXX' } //FIXME:
+}
 
 const RecursiveOptions = ({
   id,
   isCheckbox,
   options,
   handleInput,
-  data,
+  data
 }: {
-  id: string;
-  isCheckbox: boolean;
-  options: Option[];
-  handleInput: any;
-  data: Multioption;
+  id: string
+  isCheckbox: boolean
+  options: Option[]
+  handleInput: any
+  data: Multioption
 }): JSX.Element => {
-  let childData: Multioption | Array<Multioption>;
-  let suboption: Option | undefined;
+  let childData: Multioption | Array<Multioption>
+  let suboption: Option | undefined
 
   if (isCheckbox) {
     if (!data.child) {
-      data.child = [];
+      data.child = []
     }
-    childData = data.child as Array<Multioption>;
+    childData = data.child as Array<Multioption>
     return (
       <div>
         {options.map((option) => {
-          suboption = undefined;
+          suboption = undefined
           if (
             option.options &&
             isChecked(childData as Array<Multioption>, option.value)
           ) {
-            suboption = option;
+            suboption = option
           }
           return (
             <div key={data.value + option.value} className="form-check">
@@ -306,14 +306,14 @@ const RecursiveOptions = ({
                 }
                 checked={isChecked(
                   childData as Array<Multioption>,
-                  option.value,
+                  option.value
                 )}
               />
               <label className="form-check-label">{option.label}</label>
 
               {suboption! &&
                 isChecked(childData as Array<Multioption>, option.value) && (
-                  <div style={{ marginLeft: "2px" }} className="form-check">
+                  <div style={{ marginLeft: '2px' }} className="form-check">
                     <RecursiveOptions
                       id={id}
                       isCheckbox={suboption.isCheckbox!}
@@ -324,16 +324,16 @@ const RecursiveOptions = ({
                   </div>
                 )}
             </div>
-          );
+          )
         })}
       </div>
-    );
+    )
   }
 
   if (!data.child) {
-    data.child = { value: "" };
+    data.child = { value: '' }
   }
-  childData = data.child as Multioption;
+  childData = data.child as Multioption
   return (
     <>
       <div className="mb-3">
@@ -350,18 +350,18 @@ const RecursiveOptions = ({
               option.options &&
               (childData as Multioption).value === option.value
             ) {
-              suboption = option;
+              suboption = option
             }
             return (
               <option key={data.value + option.value} value={option.value}>
                 {option.label}
               </option>
-            );
+            )
           })}
         </select>
       </div>
       {suboption! && (
-        <div style={{ marginLeft: "20px" }}>
+        <div style={{ marginLeft: '20px' }}>
           <RecursiveOptions
             id={id}
             isCheckbox={suboption.isCheckbox!}
@@ -372,5 +372,5 @@ const RecursiveOptions = ({
         </div>
       )}
     </>
-  );
-};
+  )
+}

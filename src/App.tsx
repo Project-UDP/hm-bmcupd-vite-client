@@ -1,31 +1,31 @@
-import "./App.css";
-import { Navbar } from "./components/Navbar";
-import { Routes, BrowserRouter, Route, Navigate } from "react-router-dom";
-import { AuthPage } from "./pages/AuthPage/AuthPage";
-import { AuthProvider } from "./hooks/useAuth";
-import { useAuth } from "./hooks/useAuth";
-import { PatientProvider } from "./hooks/usePatient";
-import { SearchPage } from "./pages/SearchPage";
-import { DashboardPage } from "./pages/DashboardPage";
-import { ProfilePage } from "./pages/ProfilePage";
-import { AppointmentPage } from "./pages/AppointmentPage";
-import { FormPage } from "./pages/FormPage";
-import { PatientPage } from "./pages/PatientPage";
+import './App.css'
+import { Navbar } from './components/Navbar'
+import { Routes, BrowserRouter, Route, Navigate } from 'react-router-dom'
+import { AuthPage } from './pages/AuthPage/AuthPage'
+import { AuthProvider } from './hooks/useAuth'
+import { useAuth } from './hooks/useAuth'
+import { PatientProvider } from './hooks/usePatient'
+import { SearchPage } from './pages/SearchPage'
+import { DashboardPage } from './pages/DashboardPage'
+import { ProfilePage } from './pages/ProfilePage'
+import { AppointmentPage } from './pages/AppointmentPage'
+import { FormPage } from './pages/FormPage'
+import { PatientPage } from './pages/PatientPage'
 
 const App = (): JSX.Element => {
   const ProtectedRoute = ({ children }: any) => {
-    const { token } = useAuth();
-    if (!token) return <Navigate to="/login" replace />;
-    return children;
-  };
+    const { token } = useAuth()
+    if (!token) return <Navigate to="/login" replace />
+    return children
+  }
   //FIXME:infinite page refresh, when url is http://localhost:3000/patient/:id
   const RenderIfAuth = ({ children }: any) => {
-    const { token } = useAuth();
+    const { token } = useAuth()
     if (token) {
       return children
     }
-    return <></>;
-  };
+    return <></>
+  }
 
   //const { data: posts } = postApi.useFetchAllPostsQuery(5)
 
@@ -42,7 +42,7 @@ const App = (): JSX.Element => {
             <Routes>
               {routes.map(({ path, element, authRequired }) => {
                 if (!authRequired) {
-                  return <Route key={path} path={path} element={element} />;
+                  return <Route key={path} path={path} element={element} />
                 }
 
                 return (
@@ -51,63 +51,63 @@ const App = (): JSX.Element => {
                     path={path}
                     element={<ProtectedRoute>{element}</ProtectedRoute>}
                   />
-                );
+                )
               })}
             </Routes>
           </PatientProvider>
         </AuthProvider>
       </BrowserRouter>
     </div>
-  );
-};
+  )
+}
 
 const routes: AppRoute[] = [
   {
-    path: "/login",
+    path: '/login',
     element: <AuthPage />,
-    authRequired: false,
+    authRequired: false
   },
   {
-    path: "/search",
+    path: '/search',
     element: <SearchPage />,
-    authRequired: true,
+    authRequired: true
   },
   {
-    path: "/form",
+    path: '/form',
     element: <FormPage />,
-    authRequired: true,
+    authRequired: true
   },
   {
-    path: "/patient",
+    path: '/patient',
     element: <PatientPage />,
-    authRequired: true,
+    authRequired: true
   },
   {
-    path: "/dashboard",
+    path: '/dashboard',
     element: <DashboardPage />,
-    authRequired: true,
+    authRequired: true
   },
   {
-    path: "/profile",
+    path: '/profile',
     element: <ProfilePage />,
-    authRequired: true,
+    authRequired: true
   },
   {
-    path: "/appointment",
+    path: '/appointment',
     element: <AppointmentPage />,
-    authRequired: true,
+    authRequired: true
   },
   {
-    path: "*",
+    path: '*',
     element: <Navigate replace to="login" />,
-    authRequired: false,
-  },
-];
+    authRequired: false
+  }
+]
 
 interface AppRoute {
-  path: string;
-  element: JSX.Element;
-  authRequired: boolean;
+  path: string
+  element: JSX.Element
+  authRequired: boolean
 }
 
-export default App;
+export default App

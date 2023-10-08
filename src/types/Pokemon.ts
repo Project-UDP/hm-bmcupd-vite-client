@@ -1,3 +1,1 @@
-export interface Pokemon {
-    
-}
+export interface Pokemon {}

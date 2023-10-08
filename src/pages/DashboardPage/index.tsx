@@ -1,11 +1,11 @@
-import { AgeBar } from "./components/AgeBar";
-import { DominantHandDoughnut } from "./components/DominantHandDoughnut";
-import { GenderDoughnut } from "./components/GenderDoughnut";
-import { IcdCounts } from "./components/IcdCounts";
-import { NationalityDoughnut } from "./components//NationalityDoughnut";
-import { PatinetCount } from "./components/PatientCount";
-import { RegionsBar } from "./components/RegionsBar";
-import { RegistrationLineCard } from "./components/RegistrationLine/RegistrationLineCard";
+import { AgeBar } from './components/AgeBar'
+import { DominantHandDoughnut } from './components/DominantHandDoughnut'
+import { GenderDoughnut } from './components/GenderDoughnut'
+import { IcdCounts } from './components/IcdCounts'
+import { NationalityDoughnut } from './components//NationalityDoughnut'
+import { PatinetCount } from './components/PatientCount'
+import { RegionsBar } from './components/RegionsBar'
+import { RegistrationLineCard } from './components/RegistrationLine/RegistrationLineCard'
 
 export const DashboardPage = (): JSX.Element => {
   return (
@@ -97,5 +97,5 @@ export const DashboardPage = (): JSX.Element => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

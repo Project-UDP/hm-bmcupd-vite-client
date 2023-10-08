@@ -1,4 +1,4 @@
 export interface Multioption {
-    value: string;
-    child?: Multioption | Array<Multioption>;
+  value: string
+  child?: Multioption | Array<Multioption>
 }

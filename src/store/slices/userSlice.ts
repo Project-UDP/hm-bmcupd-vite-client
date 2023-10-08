@@ -1,29 +1,27 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createSlice } from '@reduxjs/toolkit'
 
 export interface IUser {
-    id: number,
-    name: string,
-    email: string,
+  id: number
+  name: string
+  email: string
 }
 
 interface UserState {
-    users: IUser[],
-    isLoading: boolean,
-    error: string
+  users: IUser[]
+  isLoading: boolean
+  error: string
 }
 
 const initialState: UserState = {
-    users: [],
-    isLoading: false,
-    error: ''
+  users: [],
+  isLoading: false,
+  error: ''
 }
 
 export const userSlice = createSlice({
-    name: 'user',
-    initialState,
-    reducers: {
-
-    }
+  name: 'user',
+  initialState,
+  reducers: {}
 })
 
 export default userSlice.reducer

@@ -1,138 +1,137 @@
-import { useEffect, useState } from "react";
-import { Patient } from "../../types/Patient";
-import { FormField, PatientDetailsForm } from "./components/PatientDetailsForm";
-import { useLocation, useNavigate } from "react-router-dom";
-import { toastUtils } from "../../utils/toastUtils";
-import { api } from "../../api/api";
-import { objectUtils } from "../../utils/objectUtils";
-import { usePatient } from "../../hooks/usePatient";
+import { useEffect, useState } from 'react'
+import { Patient } from '../../types/Patient'
+import { FormField, PatientDetailsForm } from './components/PatientDetailsForm'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { toastUtils } from '../../utils/toastUtils'
+import { api } from '../../api/api'
+import { objectUtils } from '../../utils/objectUtils'
+import { usePatient } from '../../hooks/usePatient'
 
 export const FormPage = (): JSX.Element => {
-
   const { loadPatientsWithPreviouslySetParams } = usePatient()
 
-  const [form, setForm] = useState(formDefault);
+  const [form, setForm] = useState(formDefault)
 
-  const [activeTab, setActiveTab] = useState("0");
+  const [activeTab, setActiveTab] = useState('0')
 
-  const { state } = useLocation();
+  const { state } = useLocation()
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (state === null) {
-      setForm(formDefault);
+      setForm(formDefault)
     } else {
       let patient = objectUtils.deepCopy(state.state)
       for (const key in patient) {
         if (
-          typeof patient[key] === "string" &&
+          typeof patient[key] === 'string' &&
           (patient[key].startsWith('{"value":') ||
             patient[key].startsWith('{"child":'))
         ) {
-          patient[key] = JSON.parse(patient[key]);
+          patient[key] = JSON.parse(patient[key])
         }
       }
-      setForm(patient);
+      setForm(patient)
     }
-  }, []);
+  }, [])
 
   const handleInput = (event: any, passedValue?: any) => {
     if (passedValue) {
-      setForm(JSON.parse(JSON.stringify(form)));
-      return;
+      setForm(JSON.parse(JSON.stringify(form)))
+      return
     }
-    if (event.target.type === "checkbox") {
-      let arr: any = form[event.target.id as keyof typeof form];
+    if (event.target.type === 'checkbox') {
+      let arr: any = form[event.target.id as keyof typeof form]
       if (!arr.includes(event.target.name)) {
-        arr.push(event.target.name);
+        arr.push(event.target.name)
       } else {
-        let index = arr.indexOf(event.target.name);
+        let index = arr.indexOf(event.target.name)
         if (index !== -1) {
-          arr.splice(index, 1);
+          arr.splice(index, 1)
         }
       }
-      setForm(JSON.parse(JSON.stringify(form)));
-      return;
+      setForm(JSON.parse(JSON.stringify(form)))
+      return
     }
     let value =
-      event.target.type === "checkbox"
+      event.target.type === 'checkbox'
         ? event.target.checked
-        : event.target.value;
-    if (value === "true") {
-      value = true;
-    } else if (value === "false") {
-      value = false;
+        : event.target.value
+    if (value === 'true') {
+      value = true
+    } else if (value === 'false') {
+      value = false
     }
 
-    const name = event.target.id;
+    const name = event.target.id
     if (
-      name === "iin" ||
-      name === "registrationNumber" ||
-      name === "phoneNumber"
+      name === 'iin' ||
+      name === 'registrationNumber' ||
+      name === 'phoneNumber'
     ) {
-      if (!/^\d+$/.test(value) && value !== "") {
-        alert("Только числовые значения");
-        return;
+      if (!/^\d+$/.test(value) && value !== '') {
+        alert('Только числовые значения')
+        return
       }
     }
-    setForm({ ...form, [name]: value });
-  };
+    setForm({ ...form, [name]: value })
+  }
 
   const handleSavePatient = async (
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
-    let response: any;
+    let response: any
 
     if (
-      form.iin === "" ||
-      form.firstName === "" ||
-      form.secondName === "" ||
+      form.iin === '' ||
+      form.firstName === '' ||
+      form.secondName === '' ||
       form.dateOfBirth === null ||
       form.dateOfBirth === undefined ||
-      form.registrationNumber === ""
+      form.registrationNumber === ''
     ) {
-      alert("Не заполены обязательные поля!");
-      return;
+      alert('Не заполены обязательные поля!')
+      return
     }
 
     if (state === null) {
-      response = await api.patient.add(form);
+      response = await api.patient.add(form)
     } else {
-      response = await api.patient.edit(form);
+      response = await api.patient.edit(form)
     }
     if (response?.status === 201 || response?.status === 200) {
       const message =
-        response.status === 201 ? "Пациент сохранен!" : "Пациент изменен!";
-      toastUtils.success(message);
+        response.status === 201 ? 'Пациент сохранен!' : 'Пациент изменен!'
+      toastUtils.success(message)
       await loadPatientsWithPreviouslySetParams()
-      navigate("/main");
+      navigate('/main')
     } else {
-      let content = "";
+      let content = ''
       if (
         response?.response?.data?.message ===
-        "Пользователь с таким ИИН уже существует"
+        'Пользователь с таким ИИН уже существует'
       ) {
-        content = "Пользователь с таким ИИН уже существует";
+        content = 'Пользователь с таким ИИН уже существует'
       }
-      toastUtils.error(content);
+      toastUtils.error(content)
     }
-  };
+  }
 
   const handleFormChange = (event: React.MouseEvent<HTMLDivElement>) => {
-    setActiveTab(event.currentTarget.id);
-  };
+    setActiveTab(event.currentTarget.id)
+  }
 
   return (
     <div className="container">
-      <ul style={{ marginBottom: "1rem" }} className="nav nav-tabs">
-        {tabs.map(tab => (
+      <ul style={{ marginBottom: '1rem' }} className="nav nav-tabs">
+        {tabs.map((tab) => (
           <li className="nav-item">
             <div
-              id={tab.id + ""}
+              id={tab.id + ''}
               onClick={handleFormChange}
               className={
-                activeTab === tab.id + "" ? "nav-link active" : "nav-link"
+                activeTab === tab.id + '' ? 'nav-link active' : 'nav-link'
               }
               aria-current="page"
             >
@@ -144,57 +143,57 @@ export const FormPage = (): JSX.Element => {
 
       {formSchema.map((schema, index) => {
         return (
-          activeTab === index + "" && (
+          activeTab === index + '' && (
             <PatientDetailsForm
               formData={form}
               handleInput={handleInput}
               formFields={schema}
             />
           )
-        );
+        )
       })}
 
       <button onClick={handleSavePatient} className="btn btn-primary">
         Сохранить
       </button>
     </div>
-  );
-};
+  )
+}
 
 const tabs = [
   {
     id: 0,
-    label: "Паспортные данные пациента",
+    label: 'Паспортные данные пациента'
   },
   {
     id: 1,
-    label: "Перинатальный анамнез (Anamnesis vitae)",
+    label: 'Перинатальный анамнез (Anamnesis vitae)'
   },
   {
     id: 2,
-    label: "Анамнез эпилепсии",
+    label: 'Анамнез эпилепсии'
   },
   {
     id: 3,
-    label: "Фактическая ситуация",
+    label: 'Фактическая ситуация'
   },
   {
     id: 4,
-    label: "Противосудорожные препараты (ПСП)",
+    label: 'Противосудорожные препараты (ПСП)'
   },
   {
     id: 5,
-    label: "Инструментальное исследование",
+    label: 'Инструментальное исследование'
   },
   {
     id: 6,
-    label: "Результат МРТ",
+    label: 'Результат МРТ'
   },
   {
     id: 7,
-    label: "ПЭТ КТ результат",
-  },
-];
+    label: 'ПЭТ КТ результат'
+  }
+]
 
 const formDefault: Patient = {
   id: 0,
@@ -202,41 +201,41 @@ const formDefault: Patient = {
   // region Passport data
   isResident: true,
 
-  nationality: "",
+  nationality: '',
 
   isMale: true,
 
   isRightHanded: true,
 
-  registrationNumber: "",
+  registrationNumber: '',
 
-  firstName: "",
+  firstName: '',
 
-  secondName: "",
+  secondName: '',
 
-  patronymic: "",
+  patronymic: '',
 
   dateOfBirth: null,
 
-  iin: "",
+  iin: '',
 
-  birthRegion: "",
+  birthRegion: '',
 
-  birthAddress: "",
+  birthAddress: '',
 
-  livingRegion: "",
+  livingRegion: '',
 
-  livingAddress: "",
+  livingAddress: '',
 
-  phoneNumber: "",
+  phoneNumber: '',
 
-  educationProfession: "",
+  educationProfession: '',
 
   dispensaryRegistration: null,
 
-  workStatus: "",
+  workStatus: '',
 
-  familyStatus: "",
+  familyStatus: '',
 
   isDriver: false,
   // end region
@@ -244,51 +243,51 @@ const formDefault: Patient = {
   // region Anamnesis vitae
   childCount: 0,
 
-  pregnancyFeatures: { value: "" },
+  pregnancyFeatures: { value: '' },
 
-  childBirthFeatures: { value: "" },
+  childBirthFeatures: { value: '' },
 
-  afterBirthFeatures: { value: "" },
+  afterBirthFeatures: { value: '' },
 
-  childEarlyDevelopment: "",
+  childEarlyDevelopment: '',
   // end region
 
   // region Анамнез эпилепсии
-  isFS: "",
+  isFS: '',
 
-  neuroinfection: "",
+  neuroinfection: '',
 
-  ageOfTheFirstAttack: { value: "" },
+  ageOfTheFirstAttack: { value: '' },
 
-  neonatalAndInfantAge: { value: "" },
+  neonatalAndInfantAge: { value: '' },
 
-  childrenAndYouth: { value: "" },
+  childrenAndYouth: { value: '' },
 
-  actualSituationAdultAndElderly: { value: "" },
+  actualSituationAdultAndElderly: { value: '' },
 
-  epilepsyType: "",
+  epilepsyType: '',
 
-  icd: "",
+  icd: '',
 
-  featuresOfSeizures: { value: "" },
+  featuresOfSeizures: { value: '' },
 
-  adultAndElderly: { value: "" },
+  adultAndElderly: { value: '' },
 
-  withMotorSymptoms: { value: "" },
+  withMotorSymptoms: { value: '' },
 
-  noMotorSymptoms: { value: "" },
+  noMotorSymptoms: { value: '' },
   // end region
 
   // region Фактическая ситуация
-  durationOfTheAttack: "",
+  durationOfTheAttack: '',
   // end region
 
   // region Противосудорожные препараты (ПСП)
-  inTheDebut: "",
+  inTheDebut: '',
 
-  followUpTherapy: "",
+  followUpTherapy: '',
 
-  currentTherapy: "",
+  currentTherapy: '',
 
   // valproates: [],
 
@@ -356,1619 +355,1619 @@ const formDefault: Patient = {
 
   // otherPreparates: [],
 
-  healTypes: "",
+  healTypes: '',
 
-  effectivenessGrade: "",
+  effectivenessGrade: '',
   // end region
 
   // region Инструментальное исследование
-  typesOfEEG: "",
+  typesOfEEG: '',
 
-  resultOfInterictalEEG: { value: "" },
+  resultOfInterictalEEG: { value: '' },
 
-  prevalenceResultOfInterictalEEG: { value: "" },
+  prevalenceResultOfInterictalEEG: { value: '' },
 
-  localization: { value: "" },
+  localization: { value: '' },
 
-  types: "",
+  types: '',
 
-  lateralization: "",
+  lateralization: '',
   // end region
 
   // region Результат МРТ
-  localizationnMRI: { value: "" },
+  localizationnMRI: { value: '' },
 
-  lateralizationMRI: "",
+  lateralizationMRI: '',
 
-  diagnosisMRI: { value: "" },
+  diagnosisMRI: { value: '' },
 
   // end region
 
   // region ПЭТ КТ
-  localizationPETCT: { value: "" },
+  localizationPETCT: { value: '' },
 
-  lateralizationPETCT: "",
+  lateralizationPETCT: '',
 
-  resultPETCT: "",
+  resultPETCT: '',
   // end region
 
-  lastEditingUser: "",
+  lastEditingUser: '',
 
-  registrationDate: new Date(),
-};
+  registrationDate: new Date()
+}
 
 const formFieldsPassportData: FormField[] = [
   {
-    name: "isResident",
-    label: "Резидент РК",
-    type: "options",
+    name: 'isResident',
+    label: 'Резидент РК',
+    type: 'options',
     options: [
       {
-        label: "Да",
-        value: "true",
+        label: 'Да',
+        value: 'true'
       },
       {
-        label: "Нет",
-        value: "false",
-      },
-    ],
+        label: 'Нет',
+        value: 'false'
+      }
+    ]
   },
   {
-    name: "nationality",
-    label: "Национальность",
-    type: "options",
+    name: 'nationality',
+    label: 'Национальность',
+    type: 'options',
     options: [
       {
-        label: "Казах",
-        value: "Казах",
+        label: 'Казах',
+        value: 'Казах'
       },
       {
-        label: "Русский",
-        value: "Русский",
+        label: 'Русский',
+        value: 'Русский'
       },
       {
-        label: "Узбек",
-        value: "Узбек",
+        label: 'Узбек',
+        value: 'Узбек'
       },
       {
-        label: "Другое",
-        value: "Другое",
-        isOther: true,
-      },
-    ],
+        label: 'Другое',
+        value: 'Другое',
+        isOther: true
+      }
+    ]
   },
   {
-    name: "isMale",
-    label: "Пол",
-    type: "options",
+    name: 'isMale',
+    label: 'Пол',
+    type: 'options',
     options: [
       {
-        label: "Мужчина",
-        value: "true",
+        label: 'Мужчина',
+        value: 'true'
       },
       {
-        label: "Женщина",
-        value: "false",
-      },
-    ],
+        label: 'Женщина',
+        value: 'false'
+      }
+    ]
   },
   {
-    name: "isRightHanded",
-    label: "Доминантная рука",
-    type: "options",
+    name: 'isRightHanded',
+    label: 'Доминантная рука',
+    type: 'options',
     options: [
       {
-        label: "Левша",
-        value: "false",
+        label: 'Левша',
+        value: 'false'
       },
       {
-        label: "Правша",
-        value: "true",
-      },
-    ],
+        label: 'Правша',
+        value: 'true'
+      }
+    ]
   },
   {
-    name: "registrationNumber",
-    label: "ID № (Номер регистрации)",
-    type: "text",
+    name: 'registrationNumber',
+    label: 'ID № (Номер регистрации)',
+    type: 'text'
   },
   {
-    name: "firstName",
-    label: "Имя",
-    type: "text",
+    name: 'firstName',
+    label: 'Имя',
+    type: 'text'
   },
   {
-    name: "secondName",
-    label: "Фамилия",
-    type: "text",
+    name: 'secondName',
+    label: 'Фамилия',
+    type: 'text'
   },
   {
-    name: "patronymic",
-    label: "Отчество",
-    type: "text",
+    name: 'patronymic',
+    label: 'Отчество',
+    type: 'text'
   },
   {
-    name: "dateOfBirth",
-    label: "Дата рождения",
-    type: "date",
+    name: 'dateOfBirth',
+    label: 'Дата рождения',
+    type: 'date'
   },
   {
-    name: "iin",
-    label: "ИИН (для не резидентов номер пасспорта)",
-    type: "text",
+    name: 'iin',
+    label: 'ИИН (для не резидентов номер пасспорта)',
+    type: 'text'
   },
   {
-    name: "birthRegion",
-    label: "Область рождения",
-    type: "options",
+    name: 'birthRegion',
+    label: 'Область рождения',
+    type: 'options',
     options: [
       {
-        label: "Астана",
-        value: "Астана",
+        label: 'Астана',
+        value: 'Астана'
       },
       {
-        label: "Алматы",
-        value: "Алматы",
+        label: 'Алматы',
+        value: 'Алматы'
       },
       {
-        label: "Шымкент",
-        value: "Шымкент",
+        label: 'Шымкент',
+        value: 'Шымкент'
       },
       {
-        label: "Область Абай",
-        value: "Область Абай",
+        label: 'Область Абай',
+        value: 'Область Абай'
       },
       {
-        label: "Акмолинская область",
-        value: "Акмолинская область",
+        label: 'Акмолинская область',
+        value: 'Акмолинская область'
       },
       {
-        label: "Актюбинская область",
-        value: "Актюбинская область",
+        label: 'Актюбинская область',
+        value: 'Актюбинская область'
       },
       {
-        label: "Алматинская область",
-        value: "Алматинская область",
+        label: 'Алматинская область',
+        value: 'Алматинская область'
       },
       {
-        label: "Атырауская область",
-        value: "Атырауская область",
+        label: 'Атырауская область',
+        value: 'Атырауская область'
       },
       {
-        label: "Жамбылская область",
-        value: "Жамбылская область",
+        label: 'Жамбылская область',
+        value: 'Жамбылская область'
       },
       {
-        label: "Область Жетісу",
-        value: "Область Жетісу",
+        label: 'Область Жетісу',
+        value: 'Область Жетісу'
       },
       {
-        label: "Западно-Казахстанская область",
-        value: "Западно-Казахстанская область",
+        label: 'Западно-Казахстанская область',
+        value: 'Западно-Казахстанская область'
       },
       {
-        label: "Карагандинская область",
-        value: "Карагандинская область",
+        label: 'Карагандинская область',
+        value: 'Карагандинская область'
       },
       {
-        label: "Костанайская область",
-        value: "Костанайская область",
+        label: 'Костанайская область',
+        value: 'Костанайская область'
       },
       {
-        label: "Кызылординская область",
-        value: "Кызылординская область",
+        label: 'Кызылординская область',
+        value: 'Кызылординская область'
       },
       {
-        label: "Мангистауская область",
-        value: "Мангистауская область",
+        label: 'Мангистауская область',
+        value: 'Мангистауская область'
       },
       {
-        label: "Павлодарская область",
-        value: "Павлодарская область",
+        label: 'Павлодарская область',
+        value: 'Павлодарская область'
       },
       {
-        label: "Северо-Казахстанская область",
-        value: "Северо-Казахстанская область",
+        label: 'Северо-Казахстанская область',
+        value: 'Северо-Казахстанская область'
       },
       {
-        label: "Туркестанская область",
-        value: "Туркестанская область",
+        label: 'Туркестанская область',
+        value: 'Туркестанская область'
       },
       {
-        label: "Область Ұлытау",
-        value: "Область Ұлытау",
-      },
-    ],
+        label: 'Область Ұлытау',
+        value: 'Область Ұлытау'
+      }
+    ]
   },
   {
-    name: "birthAddress",
-    label: "Место рождения",
-    type: "text",
+    name: 'birthAddress',
+    label: 'Место рождения',
+    type: 'text'
   },
   {
-    name: "livingRegion",
-    label: "Область проживания",
-    type: "options",
+    name: 'livingRegion',
+    label: 'Область проживания',
+    type: 'options',
     options: [
       {
-        label: "Астана",
-        value: "Астана",
+        label: 'Астана',
+        value: 'Астана'
       },
       {
-        label: "Алматы",
-        value: "Алматы",
+        label: 'Алматы',
+        value: 'Алматы'
       },
       {
-        label: "Шымкент",
-        value: "Шымкент",
+        label: 'Шымкент',
+        value: 'Шымкент'
       },
       {
-        label: "Область Абай",
-        value: "Область Абай",
+        label: 'Область Абай',
+        value: 'Область Абай'
       },
       {
-        label: "Акмолинская область",
-        value: "Акмолинская область",
+        label: 'Акмолинская область',
+        value: 'Акмолинская область'
       },
       {
-        label: "Актюбинская область",
-        value: "Актюбинская область",
+        label: 'Актюбинская область',
+        value: 'Актюбинская область'
       },
       {
-        label: "Алматинская область",
-        value: "Алматинская область",
+        label: 'Алматинская область',
+        value: 'Алматинская область'
       },
       {
-        label: "Атырауская область",
-        value: "Атырауская область",
+        label: 'Атырауская область',
+        value: 'Атырауская область'
       },
       {
-        label: "Жамбылская область",
-        value: "Жамбылская область",
+        label: 'Жамбылская область',
+        value: 'Жамбылская область'
       },
       {
-        label: "Область Жетісу",
-        value: "Область Жетісу",
+        label: 'Область Жетісу',
+        value: 'Область Жетісу'
       },
       {
-        label: "Западно-Казахстанская область",
-        value: "Западно-Казахстанская область",
+        label: 'Западно-Казахстанская область',
+        value: 'Западно-Казахстанская область'
       },
       {
-        label: "Карагандинская область",
-        value: "Карагандинская область",
+        label: 'Карагандинская область',
+        value: 'Карагандинская область'
       },
       {
-        label: "Костанайская область",
-        value: "Костанайская область",
+        label: 'Костанайская область',
+        value: 'Костанайская область'
       },
       {
-        label: "Кызылординская область",
-        value: "Кызылординская область",
+        label: 'Кызылординская область',
+        value: 'Кызылординская область'
       },
       {
-        label: "Мангистауская область",
-        value: "Мангистауская область",
+        label: 'Мангистауская область',
+        value: 'Мангистауская область'
       },
       {
-        label: "Павлодарская область",
-        value: "Павлодарская область",
+        label: 'Павлодарская область',
+        value: 'Павлодарская область'
       },
       {
-        label: "Северо-Казахстанская область",
-        value: "Северо-Казахстанская область",
+        label: 'Северо-Казахстанская область',
+        value: 'Северо-Казахстанская область'
       },
       {
-        label: "Туркестанская область",
-        value: "Туркестанская область",
+        label: 'Туркестанская область',
+        value: 'Туркестанская область'
       },
       {
-        label: "Область Ұлытау",
-        value: "Область Ұлытау",
-      },
-    ],
+        label: 'Область Ұлытау',
+        value: 'Область Ұлытау'
+      }
+    ]
   },
   {
-    name: "livingAddress",
-    label: "Место проживания",
-    type: "text",
+    name: 'livingAddress',
+    label: 'Место проживания',
+    type: 'text'
   },
   {
-    name: "phoneNumber",
-    label: "Номер телефона",
-    type: "text",
+    name: 'phoneNumber',
+    label: 'Номер телефона',
+    type: 'text'
   },
   {
-    name: "socialPosition",
-    label: "Социальное положение",
-    type: "label",
+    name: 'socialPosition',
+    label: 'Социальное положение',
+    type: 'label'
   },
   {
-    name: "educationProfession",
-    label: "Образование/Профессия",
-    type: "options",
+    name: 'educationProfession',
+    label: 'Образование/Профессия',
+    type: 'options',
     options: [
       {
-        label: "Дошкольное воспитание и обучение",
-        value: "Дошкольное воспитание и обучение",
+        label: 'Дошкольное воспитание и обучение',
+        value: 'Дошкольное воспитание и обучение'
       },
       {
-        label: "Среднее образование",
-        value: "Среднее образование",
+        label: 'Среднее образование',
+        value: 'Среднее образование'
       },
       {
-        label: "Высшее образование и послевузовское проф образование",
-        value: "Высшее образование и послевузовское проф образование",
-      },
-    ],
+        label: 'Высшее образование и послевузовское проф образование',
+        value: 'Высшее образование и послевузовское проф образование'
+      }
+    ]
   },
   {
-    name: "dispensaryRegistration",
-    label: "Диспансерный учет (дата учета)",
-    type: "date",
+    name: 'dispensaryRegistration',
+    label: 'Диспансерный учет (дата учета)',
+    type: 'date'
   },
   {
-    name: "workStatus",
-    label: "Занятость",
-    type: "options",
+    name: 'workStatus',
+    label: 'Занятость',
+    type: 'options',
     options: [
       {
-        label: "Работает",
-        value: "Работает",
+        label: 'Работает',
+        value: 'Работает'
       },
       {
-        label: "Временно не работает",
-        value: "Временно не работает",
+        label: 'Временно не работает',
+        value: 'Временно не работает'
       },
       {
-        label: "Не работает",
-        value: "Не работает",
-      },
-    ],
+        label: 'Не работает',
+        value: 'Не работает'
+      }
+    ]
   },
   {
-    name: "familyStatus",
-    label: "Семейное положение",
-    type: "options",
+    name: 'familyStatus',
+    label: 'Семейное положение',
+    type: 'options',
     options: [
       {
-        label: "Женат/Замужем",
-        value: "Женат/Замужем",
+        label: 'Женат/Замужем',
+        value: 'Женат/Замужем'
       },
       {
-        label: "Не женат/замужем",
-        value: "Не женат/замужем",
+        label: 'Не женат/замужем',
+        value: 'Не женат/замужем'
       },
       {
-        label: "Разведен(а)",
-        value: "Разведен(а)",
-      },
-    ],
+        label: 'Разведен(а)',
+        value: 'Разведен(а)'
+      }
+    ]
   },
   {
-    name: "isDriver",
-    label: "Вождение авто",
-    type: "options",
+    name: 'isDriver',
+    label: 'Вождение авто',
+    type: 'options',
     options: [
       {
-        label: "Да",
-        value: "true",
+        label: 'Да',
+        value: 'true'
       },
       {
-        label: "Нет",
-        value: "false",
-      },
-    ],
-  },
-];
+        label: 'Нет',
+        value: 'false'
+      }
+    ]
+  }
+]
 
 const formFieldsAnamnesisVitae: FormField[] = [
   {
-    name: "childCount",
-    label: "Ребенок по счету",
-    type: "number",
+    name: 'childCount',
+    label: 'Ребенок по счету',
+    type: 'number'
   },
   {
-    name: "pregnancyFeatures",
-    label: "Особенности течение беременности (антенатальный период)",
-    type: "multioptions",
+    name: 'pregnancyFeatures',
+    label: 'Особенности течение беременности (антенатальный период)',
+    type: 'multioptions',
     options: [
       {
-        label: "Не известно",
-        value: "Не известно",
+        label: 'Не известно',
+        value: 'Не известно'
       },
       {
-        label: "Нормально",
-        value: "Нормально",
+        label: 'Нормально',
+        value: 'Нормально'
       },
       {
-        label: "Были особенности",
-        value: "Были особенности",
+        label: 'Были особенности',
+        value: 'Были особенности',
         isCheckbox: true,
         options: [
           {
-            label: "Cвязано с роженицей",
-            value: "Cвязано с роженицей",
+            label: 'Cвязано с роженицей',
+            value: 'Cвязано с роженицей',
             isCheckbox: true,
             options: [
               {
-                label: "ВПС",
-                value: "ВПС",
+                label: 'ВПС',
+                value: 'ВПС'
               },
               {
-                label: "Анемия",
-                value: "Анемия",
+                label: 'Анемия',
+                value: 'Анемия',
                 options: [
                   {
-                    label: "Легкой степени",
-                    value: "Легкой степени",
+                    label: 'Легкой степени',
+                    value: 'Легкой степени'
                   },
                   {
-                    label: "Средней степени",
-                    value: "Средней степени",
+                    label: 'Средней степени',
+                    value: 'Средней степени'
                   },
                   {
-                    label: "Тяжелой степени",
-                    value: "Тяжелой степени",
-                  },
-                ],
+                    label: 'Тяжелой степени',
+                    value: 'Тяжелой степени'
+                  }
+                ]
               },
               {
-                label: "Патология щитовидной железы",
-                value: "Патология щитовидной железы",
+                label: 'Патология щитовидной железы',
+                value: 'Патология щитовидной железы',
                 options: [
                   {
-                    label: "Тиреотоксикоз",
-                    value: "Тиреотоксикоз",
+                    label: 'Тиреотоксикоз',
+                    value: 'Тиреотоксикоз'
                   },
                   {
-                    label: "Гипотиреоз",
-                    value: "Гипотиреоз",
-                  },
-                ],
+                    label: 'Гипотиреоз',
+                    value: 'Гипотиреоз'
+                  }
+                ]
               },
               {
-                label: "АГ",
-                value: "АГ",
+                label: 'АГ',
+                value: 'АГ'
               },
               {
-                label: "СД",
-                value: "СД",
+                label: 'СД',
+                value: 'СД'
               },
               {
-                label: "Васкулиты",
-                value: "Васкулиты",
+                label: 'Васкулиты',
+                value: 'Васкулиты'
               },
               {
-                label: "Другое",
-                value: "Другое",
-              },
-            ],
+                label: 'Другое',
+                value: 'Другое'
+              }
+            ]
           },
 
           {
-            label: "Связано с плодом",
-            value: "Связано с плодом",
+            label: 'Связано с плодом',
+            value: 'Связано с плодом',
             isCheckbox: true,
             options: [
               {
-                label: "УПБ",
-                value: "УПБ",
+                label: 'УПБ',
+                value: 'УПБ'
               },
               {
-                label: "Гипертонус",
-                value: "Гипертонус",
+                label: 'Гипертонус',
+                value: 'Гипертонус'
               },
               {
-                label: "Анемия",
-                value: "Анемия",
+                label: 'Анемия',
+                value: 'Анемия'
               },
               {
-                label: "Преэклампсия",
-                value: "Преэклампсия",
+                label: 'Преэклампсия',
+                value: 'Преэклампсия'
               },
               {
-                label: "ЗВУР",
-                value: "ЗВУР",
-              },
-            ],
-          },
-        ],
-      },
-    ],
+                label: 'ЗВУР',
+                value: 'ЗВУР'
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
-    name: "childBirthFeatures",
-    label: "Особенности родов (интранатальный период)",
-    type: "multioptions",
+    name: 'childBirthFeatures',
+    label: 'Особенности родов (интранатальный период)',
+    type: 'multioptions',
     options: [
       {
-        label: "Не известно",
-        value: "Не известно",
+        label: 'Не известно',
+        value: 'Не известно'
       },
       {
-        label: "Без особенности",
-        value: "Без особенности",
+        label: 'Без особенности',
+        value: 'Без особенности'
       },
       {
-        label: "Были особенности",
-        value: "Были особенности",
+        label: 'Были особенности',
+        value: 'Были особенности',
         isCheckbox: true,
         options: [
           {
-            label: "Преждевременные роды",
-            value: "Преждевременные роды",
+            label: 'Преждевременные роды',
+            value: 'Преждевременные роды',
             isCheckbox: true,
             options: [
               {
-                label: "Недоношенный (до 37 нед)",
-                value: "Недоношенный (до 37 нед)",
+                label: 'Недоношенный (до 37 нед)',
+                value: 'Недоношенный (до 37 нед)'
               },
               {
-                label: "Доношенный",
-                value: "Доношенный",
-              },
-            ],
+                label: 'Доношенный',
+                value: 'Доношенный'
+              }
+            ]
           },
           {
-            label: "Родовая травма",
-            value: "Родовая травма",
+            label: 'Родовая травма',
+            value: 'Родовая травма',
             isCheckbox: true,
             options: [
               {
-                label: "Кефалогематома",
-                value: "Кефалогематома",
+                label: 'Кефалогематома',
+                value: 'Кефалогематома'
               },
               {
-                label: "Тазовое предлежание",
-                value: "Тазовое предлежание",
+                label: 'Тазовое предлежание',
+                value: 'Тазовое предлежание'
               },
               {
-                label: "Ножное предлежание",
-                value: "Ножное предлежание",
-              },
-            ],
+                label: 'Ножное предлежание',
+                value: 'Ножное предлежание'
+              }
+            ]
           },
           {
-            label: "Обвитие пуповиной вокруг шеи",
-            value: "Обвитие пуповиной вокруг шеи",
+            label: 'Обвитие пуповиной вокруг шеи',
+            value: 'Обвитие пуповиной вокруг шеи',
             isCheckbox: true,
             options: [
               {
-                label: "Тугое",
-                value: "Тугое",
+                label: 'Тугое',
+                value: 'Тугое',
                 options: [
                   {
-                    label: "1 кратное",
-                    value: "1 кратное",
+                    label: '1 кратное',
+                    value: '1 кратное'
                   },
                   {
-                    label: "2-х кратное",
-                    value: "2-х кратное",
+                    label: '2-х кратное',
+                    value: '2-х кратное'
                   },
                   {
-                    label: "3-х кратное",
-                    value: "3-х кратное",
-                  },
-                ],
+                    label: '3-х кратное',
+                    value: '3-х кратное'
+                  }
+                ]
               },
               {
-                label: "Не тугое",
-                value: "Не тугое",
+                label: 'Не тугое',
+                value: 'Не тугое',
                 options: [
                   {
-                    label: "1 кратное",
-                    value: "1 кратное",
+                    label: '1 кратное',
+                    value: '1 кратное'
                   },
                   {
-                    label: "2-х кратное",
-                    value: "2-х кратное",
+                    label: '2-х кратное',
+                    value: '2-х кратное'
                   },
                   {
-                    label: "3-х кратное",
-                    value: "3-х кратное",
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
+                    label: '3-х кратное',
+                    value: '3-х кратное'
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
-    name: "afterBirthFeatures",
-    label: "Особенности после родов (постнатальный период)",
-    type: "multioptions",
+    name: 'afterBirthFeatures',
+    label: 'Особенности после родов (постнатальный период)',
+    type: 'multioptions',
     options: [
       {
-        label: "Нет",
-        value: "Нет",
+        label: 'Нет',
+        value: 'Нет'
       },
       {
-        label: "Не известно",
-        value: "Не известно",
+        label: 'Не известно',
+        value: 'Не известно'
       },
       {
-        label: "Есть",
-        value: "Есть",
+        label: 'Есть',
+        value: 'Есть',
         isCheckbox: true,
         options: [
           {
-            label: "Желтушность",
-            value: "Желтушность",
+            label: 'Желтушность',
+            value: 'Желтушность'
           },
           {
-            label: "ОАРИТ/ПИТ",
-            value: "ОАРИТ/ПИТ",
+            label: 'ОАРИТ/ПИТ',
+            value: 'ОАРИТ/ПИТ'
           },
           {
-            label: "2-й этап выхаживание",
-            value: "2-й этап выхаживание",
-          },
-        ],
-      },
-    ],
+            label: '2-й этап выхаживание',
+            value: '2-й этап выхаживание'
+          }
+        ]
+      }
+    ]
   },
   {
-    name: "childEarlyDevelopment",
-    label: "Ранее развитие (формула развития ребенка)",
-    type: "options",
+    name: 'childEarlyDevelopment',
+    label: 'Ранее развитие (формула развития ребенка)',
+    type: 'options',
     options: [
       {
-        label: "Норма",
-        value: "Норма",
+        label: 'Норма',
+        value: 'Норма'
       },
       {
-        label: "Задержка развития (до эпилепсии и после эпилепсии)",
-        value: "Задержка развития (до эпилепсии и после эпилепсии)",
-      },
-    ],
-  },
-];
+        label: 'Задержка развития (до эпилепсии и после эпилепсии)',
+        value: 'Задержка развития (до эпилепсии и после эпилепсии)'
+      }
+    ]
+  }
+]
 
 const formFieldsAnamnesisEpilepsy: FormField[] = [
   {
-    name: "isFS",
-    label: "ФС",
-    type: "options",
+    name: 'isFS',
+    label: 'ФС',
+    type: 'options',
     options: [
       {
-        label: "Да",
-        value: "Да",
+        label: 'Да',
+        value: 'Да'
       },
       {
-        label: "Нет",
-        value: "Нет",
+        label: 'Нет',
+        value: 'Нет'
       },
       {
-        label: "Не известно",
-        value: "Не известно",
-      },
-    ],
+        label: 'Не известно',
+        value: 'Не известно'
+      }
+    ]
   },
   {
-    name: "neuroinfection",
-    label: "Нейроинфекция",
-    type: "options",
+    name: 'neuroinfection',
+    label: 'Нейроинфекция',
+    type: 'options',
     options: [
       {
-        label: "Менингит",
-        value: "Менингит",
+        label: 'Менингит',
+        value: 'Менингит'
       },
       {
-        label: "Энцефалит",
-        value: "Энцефалит",
+        label: 'Энцефалит',
+        value: 'Энцефалит'
       },
       {
-        label: "Другое",
-        value: "Другое",
-      },
-    ],
+        label: 'Другое',
+        value: 'Другое'
+      }
+    ]
   },
   {
-    name: "ageOfTheFirstAttack",
-    label: "Возраст первого приступа (полный возраст)",
-    type: "multioptions",
+    name: 'ageOfTheFirstAttack',
+    label: 'Возраст первого приступа (полный возраст)',
+    type: 'multioptions',
     options: [
       {
-        label: "Взрослый",
-        value: "Взрослый",
+        label: 'Взрослый',
+        value: 'Взрослый',
         options: [
           {
-            label: "18-44 молодой",
-            value: "18-44 молодой",
+            label: '18-44 молодой',
+            value: '18-44 молодой'
           },
           {
-            label: "45-59 средний",
-            value: "45-59 средний",
+            label: '45-59 средний',
+            value: '45-59 средний'
           },
           {
-            label: "60-74 пожилой",
-            value: "60-74 пожилой",
+            label: '60-74 пожилой',
+            value: '60-74 пожилой'
           },
           {
-            label: "75-90 старческий",
-            value: "75-90 старческий",
+            label: '75-90 старческий',
+            value: '75-90 старческий'
           },
           {
-            label: "90 и выше долгожители",
-            value: "90 и выше долгожители",
-          },
-        ],
+            label: '90 и выше долгожители',
+            value: '90 и выше долгожители'
+          }
+        ]
       },
       {
-        label: "Детский ",
-        value: "Детский",
+        label: 'Детский ',
+        value: 'Детский',
         options: [
           {
-            label: "до 1 года младенчество",
-            value: "18-44 молодой",
+            label: 'до 1 года младенчество',
+            value: '18-44 молодой'
           },
           {
-            label: "ранее детство 1-3",
-            value: "ранее детство 1-3",
+            label: 'ранее детство 1-3',
+            value: 'ранее детство 1-3'
           },
           {
-            label: "дошкольное детство – 3-6",
-            value: "дошкольное детство – 3-6",
+            label: 'дошкольное детство – 3-6',
+            value: 'дошкольное детство – 3-6'
           },
           {
-            label: "младший школьный 6-7 и 10-11",
-            value: "младший школьный 6-7 и 10-11",
+            label: 'младший школьный 6-7 и 10-11',
+            value: 'младший школьный 6-7 и 10-11'
           },
           {
-            label: "подростковый 10-11 и до 14-15 л",
-            value: "подростковый 10-11 и до 14-15 л",
+            label: 'подростковый 10-11 и до 14-15 л',
+            value: 'подростковый 10-11 и до 14-15 л'
           },
           {
-            label: "юношеский 14-18",
-            value: "юношеский 14-18",
-          },
-        ],
-      },
-    ],
+            label: 'юношеский 14-18',
+            value: 'юношеский 14-18'
+          }
+        ]
+      }
+    ]
   },
   {
-    name: "seizuresTypes",
-    label: "Типы приступов",
-    type: "label",
+    name: 'seizuresTypes',
+    label: 'Типы приступов',
+    type: 'label'
   },
   {
-    name: "neonatalAndInfantAge",
-    label: "неонатальный и младенческий возраст:",
-    type: "multioptions",
+    name: 'neonatalAndInfantAge',
+    label: 'неонатальный и младенческий возраст:',
+    type: 'multioptions',
     options: [
       {
-        label: "типы приступов",
-        value: "типы приступов",
+        label: 'типы приступов',
+        value: 'типы приступов',
         isCheckbox: true,
         options: [
           {
-            label: "тонический",
-            value: "тонический",
+            label: 'тонический',
+            value: 'тонический',
             isCheckbox: true,
             options: [
               {
-                label: "фокальный",
-                value: "фокальный",
+                label: 'фокальный',
+                value: 'фокальный'
               },
               {
-                label: "билатеральный симметричный",
-                value: "билатеральный симметричный",
+                label: 'билатеральный симметричный',
+                value: 'билатеральный симметричный'
               },
               {
-                label: "билатеральный асимметричный",
-                value: "билатеральный асимметричный",
-              },
-            ],
+                label: 'билатеральный асимметричный',
+                value: 'билатеральный асимметричный'
+              }
+            ]
           },
           {
-            label: "клонический",
-            value: "клонический",
+            label: 'клонический',
+            value: 'клонический',
             isCheckbox: true,
             options: [
               {
-                label: "фокальный",
-                value: "фокальный",
+                label: 'фокальный',
+                value: 'фокальный'
               },
               {
-                label: "мультифокальный",
-                value: "мультифокальный",
+                label: 'мультифокальный',
+                value: 'мультифокальный'
               },
               {
-                label: "билатеральный",
-                value: "билатеральный",
-              },
-            ],
+                label: 'билатеральный',
+                value: 'билатеральный'
+              }
+            ]
           },
           {
-            label: "миоклонический",
-            value: "миоклонический",
+            label: 'миоклонический',
+            value: 'миоклонический',
             isCheckbox: true,
             options: [
               {
-                label: "фокальный",
-                value: "фокальный",
+                label: 'фокальный',
+                value: 'фокальный'
               },
               {
-                label: "мультифокальный",
-                value: "мультифокальный",
+                label: 'мультифокальный',
+                value: 'мультифокальный'
               },
               {
-                label: "билатеральный симметричный",
-                value: "билатеральный симметричный",
+                label: 'билатеральный симметричный',
+                value: 'билатеральный симметричный'
               },
               {
-                label: "билатеральный асимметричный",
-                value: "билатеральный асимметричный",
-              },
-            ],
+                label: 'билатеральный асимметричный',
+                value: 'билатеральный асимметричный'
+              }
+            ]
           },
           {
-            label: "эпилептический спазм",
-            value: "эпилептический спазм",
+            label: 'эпилептический спазм',
+            value: 'эпилептический спазм',
             isCheckbox: true,
             options: [
               {
-                label: "унилатеральный",
-                value: "унилатеральный",
+                label: 'унилатеральный',
+                value: 'унилатеральный'
               },
               {
-                label: "билатеральный симметричный",
-                value: "билатеральный симметричный",
+                label: 'билатеральный симметричный',
+                value: 'билатеральный симметричный'
               },
               {
-                label: "билатеральный асимметричный",
-                value: "билатеральный асимметричный",
-              },
-            ],
+                label: 'билатеральный асимметричный',
+                value: 'билатеральный асимметричный'
+              }
+            ]
           },
           {
-            label: "автоматизмы",
-            value: "автоматизмы",
+            label: 'автоматизмы',
+            value: 'автоматизмы',
             isCheckbox: true,
             options: [
               {
-                label: "унилатеральный",
-                value: "унилатеральный",
+                label: 'унилатеральный',
+                value: 'унилатеральный'
               },
               {
-                label: "билатеральный симметричный",
-                value: "билатеральный симметричный",
+                label: 'билатеральный симметричный',
+                value: 'билатеральный симметричный'
               },
               {
-                label: "билатеральный асимметричный",
-                value: "билатеральный асимметричный",
-              },
-            ],
-          },
-        ],
+                label: 'билатеральный асимметричный',
+                value: 'билатеральный асимметричный'
+              }
+            ]
+          }
+        ]
       },
       {
-        label: "синдромы",
-        value: "синдромы",
+        label: 'синдромы',
+        value: 'синдромы',
         isCheckbox: true,
         options: [
           {
-            label: "эволюционная и эпилептическая энцефалопатия (ЭЭЭ)",
-            value: "эволюционная и эпилептическая энцефалопатия (ЭЭЭ)",
+            label: 'эволюционная и эпилептическая энцефалопатия (ЭЭЭ)',
+            value: 'эволюционная и эпилептическая энцефалопатия (ЭЭЭ)',
             isCheckbox: true,
             options: [
               {
                 label:
-                  "ранняя младенческая эволюционная и эпилептическая энцефалопатия",
+                  'ранняя младенческая эволюционная и эпилептическая энцефалопатия',
                 value:
-                  "ранняя младенческая эволюционная и эпилептическая энцефалопатия",
+                  'ранняя младенческая эволюционная и эпилептическая энцефалопатия'
               },
               {
                 label:
-                  "эпилепсия младенчества с мигрирующими фокальными приступами",
+                  'эпилепсия младенчества с мигрирующими фокальными приступами',
                 value:
-                  "эпилепсия младенчества с мигрирующими фокальными приступами",
+                  'эпилепсия младенчества с мигрирующими фокальными приступами'
               },
               {
-                label: "синдром инфантильных эпилептический спазмов",
-                value: "синдром инфантильных эпилептический спазмов",
+                label: 'синдром инфантильных эпилептический спазмов',
+                value: 'синдром инфантильных эпилептический спазмов'
               },
               {
-                label: "синдром Драве",
-                value: "синдром Драве",
-              },
-            ],
-          },
-        ],
+                label: 'синдром Драве',
+                value: 'синдром Драве'
+              }
+            ]
+          }
+        ]
       },
       {
-        label: "этиологически специфические синдромы",
-        value: "этиологически специфические синдромы",
+        label: 'этиологически специфические синдромы',
+        value: 'этиологически специфические синдромы',
         isCheckbox: true,
         options: [
           {
-            label: "KCNQ2-DEE",
-            value: "KCNQ2-DEE",
+            label: 'KCNQ2-DEE',
+            value: 'KCNQ2-DEE'
           },
           {
-            label: "PD-DEE",
-            value: "PD-DEE",
+            label: 'PD-DEE',
+            value: 'PD-DEE'
           },
           {
-            label: "PNPO-DEE",
-            value: "PNPO-DEE",
+            label: 'PNPO-DEE',
+            value: 'PNPO-DEE'
           },
           {
-            label: "P5PD-DEE",
-            value: "P5PD-DEE",
+            label: 'P5PD-DEE',
+            value: 'P5PD-DEE'
           },
           {
-            label: "CDKL5-DEE",
-            value: "CDKL5-DEE",
+            label: 'CDKL5-DEE',
+            value: 'CDKL5-DEE'
           },
           {
-            label: "PCDH19",
-            value: "PCDH19",
+            label: 'PCDH19',
+            value: 'PCDH19'
           },
           {
-            label: "GLUT1DS",
-            value: "GLUT1DS",
+            label: 'GLUT1DS',
+            value: 'GLUT1DS'
           },
           {
-            label: "SWS",
-            value: "SWS",
+            label: 'SWS',
+            value: 'SWS'
           },
           {
-            label: "GS-HH",
-            value: "GS-HH",
-          },
-        ],
-      },
-    ],
+            label: 'GS-HH',
+            value: 'GS-HH'
+          }
+        ]
+      }
+    ]
   },
   {
-    name: "childrenAndYouth",
-    label: "детский и юношеский возраст",
-    type: "multioptions",
+    name: 'childrenAndYouth',
+    label: 'детский и юношеский возраст',
+    type: 'multioptions',
     options: [
       {
-        label: "фокальные эпилептические синдромы",
-        value: "фокальные эпилептические синдромы",
+        label: 'фокальные эпилептические синдромы',
+        value: 'фокальные эпилептические синдромы',
         isCheckbox: true,
         options: [
           {
-            label: "самокупирующиеся эпилепсия с центро-темпоральными спайками",
-            value: "самокупирующиеся эпилепсия с центро-темпоральными спайками",
+            label: 'самокупирующиеся эпилепсия с центро-темпоральными спайками',
+            value: 'самокупирующиеся эпилепсия с центро-темпоральными спайками'
           },
           {
-            label: "самокупирующиеся эпилепсия с вегетативными приступами",
-            value: "самокупирующиеся эпилепсия с вегетативными приступами",
+            label: 'самокупирующиеся эпилепсия с вегетативными приступами',
+            value: 'самокупирующиеся эпилепсия с вегетативными приступами'
           },
           {
-            label: "детская затылочная зрительная эпилепсия",
-            value: "детская затылочная зрительная эпилепсия",
+            label: 'детская затылочная зрительная эпилепсия',
+            value: 'детская затылочная зрительная эпилепсия'
           },
           {
-            label: "фотосенситивная затылочная эпилепсия",
-            value: "фотосенситивная затылочная эпилепсия",
+            label: 'фотосенситивная затылочная эпилепсия',
+            value: 'фотосенситивная затылочная эпилепсия'
           },
           {
-            label: "автоматизмы",
-            value: "автоматизмы",
-          },
-        ],
+            label: 'автоматизмы',
+            value: 'автоматизмы'
+          }
+        ]
       },
       {
-        label: "генерализованная генетическая эпилепсия",
-        value: "генерализованная генетическая эпилепсия",
+        label: 'генерализованная генетическая эпилепсия',
+        value: 'генерализованная генетическая эпилепсия',
         isCheckbox: true,
         options: [
           {
-            label: "детская абсансная эпилепсия",
-            value: "детская абсансная эпилепсия",
+            label: 'детская абсансная эпилепсия',
+            value: 'детская абсансная эпилепсия'
           },
           {
-            label: "юношеская абсансная эпилепсия",
-            value: "юношеская абсансная эпилепсия",
+            label: 'юношеская абсансная эпилепсия',
+            value: 'юношеская абсансная эпилепсия'
           },
           {
-            label: "юношеская миоклоническая эпилепсия",
-            value: "юношеская миоклоническая эпилепсия",
+            label: 'юношеская миоклоническая эпилепсия',
+            value: 'юношеская миоклоническая эпилепсия'
           },
           {
-            label: "изолированная ГСП",
-            value: "изолированная ГСП",
+            label: 'изолированная ГСП',
+            value: 'изолированная ГСП'
           },
           {
-            label: "ГСП пробуждения",
-            value: "ГСП пробуждения",
-          },
-        ],
+            label: 'ГСП пробуждения',
+            value: 'ГСП пробуждения'
+          }
+        ]
       },
       {
-        label: "фокальная эпилепсия",
-        value: "фокальная эпилепсия",
+        label: 'фокальная эпилепсия',
+        value: 'фокальная эпилепсия',
         isCheckbox: true,
         options: [
           {
-            label: "лобная",
-            value: "лобная",
+            label: 'лобная',
+            value: 'лобная'
           },
           {
-            label: "теменная",
-            value: "теменная",
+            label: 'теменная',
+            value: 'теменная'
           },
           {
-            label: "височная",
-            value: "височная",
+            label: 'височная',
+            value: 'височная'
           },
           {
-            label: "затылочная ",
-            value: "затылочная ",
-          },
-        ],
-      },
-    ],
+            label: 'затылочная ',
+            value: 'затылочная '
+          }
+        ]
+      }
+    ]
   },
   {
-    name: "adultAndElderly",
-    label: "взрослый и пожилой возраст",
-    type: "multioptions",
+    name: 'adultAndElderly',
+    label: 'взрослый и пожилой возраст',
+    type: 'multioptions',
     options: [
       {
-        label: "фокальное начало",
-        value: "фокальное начало",
+        label: 'фокальное начало',
+        value: 'фокальное начало',
         isCheckbox: true,
         options: [
           {
-            label: "Осознанный",
-            value: "Осознанный",
+            label: 'Осознанный',
+            value: 'Осознанный',
             options: [
               {
-                label: "моторный",
-                value: "моторный",
+                label: 'моторный',
+                value: 'моторный'
               },
               {
-                label: "не моторный",
-                value: "не моторный",
-              },
-            ],
+                label: 'не моторный',
+                value: 'не моторный'
+              }
+            ]
           },
           {
-            label: "Нарушения осознанности",
-            value: "Нарушения осознанности",
+            label: 'Нарушения осознанности',
+            value: 'Нарушения осознанности',
             options: [
               {
-                label: "моторный",
-                value: "моторный",
+                label: 'моторный',
+                value: 'моторный'
               },
               {
-                label: "не моторный",
-                value: "не моторный",
-              },
-            ],
+                label: 'не моторный',
+                value: 'не моторный'
+              }
+            ]
           },
           {
             label:
-              "билатеральный тонико-клонический приступ с фокальным дебютом",
+              'билатеральный тонико-клонический приступ с фокальным дебютом',
             value:
-              "билатеральный тонико-клонический приступ с фокальным дебютом",
-          },
-        ],
+              'билатеральный тонико-клонический приступ с фокальным дебютом'
+          }
+        ]
       },
       {
-        label: "генерализованное начало",
-        value: "генерализованное начало",
+        label: 'генерализованное начало',
+        value: 'генерализованное начало',
         options: [
           {
-            label: "моторный",
-            value: "моторный",
+            label: 'моторный',
+            value: 'моторный',
             isCheckbox: true,
             options: [
               {
-                label: "тонико-клонический приступ",
-                value: "тонико-клонический приступ",
+                label: 'тонико-клонический приступ',
+                value: 'тонико-клонический приступ'
               },
               {
-                label: "другие моторные приступы",
-                value: "другие моторные приступы",
-              },
-            ],
+                label: 'другие моторные приступы',
+                value: 'другие моторные приступы'
+              }
+            ]
           },
           {
-            label: "не моторный",
-            value: "не моторный",
+            label: 'не моторный',
+            value: 'не моторный',
             isCheckbox: true,
             options: [
               {
-                label: " абсансный приступ",
-                value: " абсансный приступ",
-              },
-            ],
-          },
-        ],
+                label: ' абсансный приступ',
+                value: ' абсансный приступ'
+              }
+            ]
+          }
+        ]
       },
       {
-        label: "приступ с неизвестным началом",
-        value: "приступ с неизвестным началом",
+        label: 'приступ с неизвестным началом',
+        value: 'приступ с неизвестным началом',
         options: [
           {
-            label: "моторный",
-            value: "моторный",
+            label: 'моторный',
+            value: 'моторный'
           },
           {
-            label: "не моторный",
-            value: "не моторный",
+            label: 'не моторный',
+            value: 'не моторный'
           },
           {
-            label: "не классифицируемый",
-            value: "не классифицируемый",
-          },
-        ],
-      },
-    ],
+            label: 'не классифицируемый',
+            value: 'не классифицируемый'
+          }
+        ]
+      }
+    ]
   },
   {
-    name: "epilepsyStatus",
-    label: "Эпилептический статус (ЭС):",
-    type: "label",
+    name: 'epilepsyStatus',
+    label: 'Эпилептический статус (ЭС):',
+    type: 'label'
   },
   {
-    name: "withMotorSymptoms",
-    label: "с выраженными двигательными симптомами",
-    type: "multioptions",
+    name: 'withMotorSymptoms',
+    label: 'с выраженными двигательными симптомами',
+    type: 'multioptions',
     options: [
       {
-        label: "судорожный ЭС",
-        value: "судорожный ЭС",
+        label: 'судорожный ЭС',
+        value: 'судорожный ЭС',
         options: [
           {
-            label: "генерализованный судорожный ЭС",
-            value: "генерализованный судорожный ЭС",
+            label: 'генерализованный судорожный ЭС',
+            value: 'генерализованный судорожный ЭС'
           },
           {
-            label: "фокальное начало, переходящее в двусторонний судорожный ЭС",
-            value: "фокальное начало, переходящее в двусторонний судорожный ЭС",
+            label: 'фокальное начало, переходящее в двусторонний судорожный ЭС',
+            value: 'фокальное начало, переходящее в двусторонний судорожный ЭС'
           },
           {
-            label: "неизвестно, фокальный или генерализованный",
-            value: "неизвестно, фокальный или генерализованный",
-          },
-        ],
+            label: 'неизвестно, фокальный или генерализованный',
+            value: 'неизвестно, фокальный или генерализованный'
+          }
+        ]
       },
       {
         label:
-          "миоклонический ЭС (выраженные эпилептические миоклонические подергивание)",
+          'миоклонический ЭС (выраженные эпилептические миоклонические подергивание)',
         value:
-          "миоклонический ЭС (выраженные эпилептические миоклонические подергивание)",
+          'миоклонический ЭС (выраженные эпилептические миоклонические подергивание)',
         options: [
           {
-            label: "с комой",
-            value: "с комой",
+            label: 'с комой',
+            value: 'с комой'
           },
           {
-            label: "без комы",
-            value: "без комы",
-          },
-        ],
+            label: 'без комы',
+            value: 'без комы'
+          }
+        ]
       },
       {
-        label: "фокальный моторный",
-        value: "фокальный моторный",
+        label: 'фокальный моторный',
+        value: 'фокальный моторный',
         options: [
           {
-            label: "повторяющиеся фокальные моторные приступы (Джексоновские)",
-            value: "повторяющиеся фокальные моторные приступы (Джексоновские)",
+            label: 'повторяющиеся фокальные моторные приступы (Джексоновские)',
+            value: 'повторяющиеся фокальные моторные приступы (Джексоновские)'
           },
           {
-            label: "продолженная парциальная эпилепсия",
-            value: "продолженная парциальная эпилепсия",
+            label: 'продолженная парциальная эпилепсия',
+            value: 'продолженная парциальная эпилепсия'
           },
           {
-            label: "Адверсивный статус",
-            value: "Адверсивный статус",
+            label: 'Адверсивный статус',
+            value: 'Адверсивный статус'
           },
           {
-            label: "Окулоклонический статус",
-            value: "Окулоклонический статус",
+            label: 'Окулоклонический статус',
+            value: 'Окулоклонический статус'
           },
           {
-            label: "Иктальный парез (фокальный паралитический ЭС)",
-            value: "Иктальный парез (фокальный паралитический ЭС)",
-          },
-        ],
+            label: 'Иктальный парез (фокальный паралитический ЭС)',
+            value: 'Иктальный парез (фокальный паралитический ЭС)'
+          }
+        ]
       },
       {
-        label: "тонический статус",
-        value: "тонический статус",
+        label: 'тонический статус',
+        value: 'тонический статус'
       },
       {
-        label: "гиперкинетический ЭС",
-        value: "гиперкинетический ЭС",
-      },
-    ],
+        label: 'гиперкинетический ЭС',
+        value: 'гиперкинетический ЭС'
+      }
+    ]
   },
   {
-    name: "noMotorSymptoms",
-    label: "без выраженной двигательной симптоматики (без судорожный ЭС)",
-    type: "multioptions",
+    name: 'noMotorSymptoms',
+    label: 'без выраженной двигательной симптоматики (без судорожный ЭС)',
+    type: 'multioptions',
     options: [
       {
-        label: "без судорожный ЭС с комой",
-        value: "без судорожный ЭС с комой",
+        label: 'без судорожный ЭС с комой',
+        value: 'без судорожный ЭС с комой'
       },
       {
-        label: "без судорожный ЭС без комы",
-        value: "без судорожный ЭС без комы",
+        label: 'без судорожный ЭС без комы',
+        value: 'без судорожный ЭС без комы',
         options: [
           {
-            label: "генерализованный",
-            value: "генерализованный",
+            label: 'генерализованный',
+            value: 'генерализованный',
             options: [
               {
-                label: "статус типичного абсанса",
-                value: "статус типичного абсанса",
+                label: 'статус типичного абсанса',
+                value: 'статус типичного абсанса'
               },
               {
-                label: "статус миоклонического абсанса",
-                value: "статус миоклонического абсанса",
+                label: 'статус миоклонического абсанса',
+                value: 'статус миоклонического абсанса'
               },
               {
-                label: "статус атипичного абсанса",
-                value: "статус атипичного абсанса",
-              },
-            ],
+                label: 'статус атипичного абсанса',
+                value: 'статус атипичного абсанса'
+              }
+            ]
           },
           {
-            label: "фокальный",
-            value: "фокальный",
+            label: 'фокальный',
+            value: 'фокальный',
             options: [
               {
-                label: "продолженная аура",
-                value: "продолженная аура",
+                label: 'продолженная аура',
+                value: 'продолженная аура'
               },
               {
-                label: "сенсорными",
-                value: "сенсорными",
+                label: 'сенсорными',
+                value: 'сенсорными'
               },
               {
-                label: "зрительными",
-                value: "зрительными",
+                label: 'зрительными',
+                value: 'зрительными'
               },
               {
-                label: "обонятельными",
-                value: "обонятельными",
+                label: 'обонятельными',
+                value: 'обонятельными'
               },
               {
-                label: "вкусовыми",
-                value: "вкусовыми",
+                label: 'вкусовыми',
+                value: 'вкусовыми'
               },
               {
                 label:
-                  "эмоциональными/психическими/эмпирическими или слуховыми симптомами",
+                  'эмоциональными/психическими/эмпирическими или слуховыми симптомами',
                 value:
-                  "эмоциональными/психическими/эмпирическими или слуховыми симптомами",
-              },
-            ],
+                  'эмоциональными/психическими/эмпирическими или слуховыми симптомами'
+              }
+            ]
           },
           {
-            label: "неизвестно, фокальный или генерализованный",
-            value: "неизвестно, фокальный или генерализованный",
-            options: [{ label: "вегетативный ЭС", value: "вегетативный ЭС" }],
-          },
-        ],
-      },
-    ],
-  },
-];
+            label: 'неизвестно, фокальный или генерализованный',
+            value: 'неизвестно, фокальный или генерализованный',
+            options: [{ label: 'вегетативный ЭС', value: 'вегетативный ЭС' }]
+          }
+        ]
+      }
+    ]
+  }
+]
 
 const formFieldActualSituation: FormField[] = [
   {
-    name: "actualSituationAdultAndElderly",
-    label: "взрослый и пожилой возраст",
-    type: "multioptions",
+    name: 'actualSituationAdultAndElderly',
+    label: 'взрослый и пожилой возраст',
+    type: 'multioptions',
     options: [
       {
-        label: "фокальное начало",
-        value: "фокальное начало",
+        label: 'фокальное начало',
+        value: 'фокальное начало',
         isCheckbox: true,
         options: [
           {
-            label: "Осознанный",
-            value: "Осознанный",
+            label: 'Осознанный',
+            value: 'Осознанный',
             options: [
               {
-                label: "моторный",
-                value: "моторный",
+                label: 'моторный',
+                value: 'моторный'
               },
               {
-                label: "не моторный",
-                value: "не моторный",
-              },
-            ],
+                label: 'не моторный',
+                value: 'не моторный'
+              }
+            ]
           },
           {
-            label: "Нарушения осознанности",
-            value: "Нарушения осознанности",
+            label: 'Нарушения осознанности',
+            value: 'Нарушения осознанности',
             options: [
               {
-                label: "моторный",
-                value: "моторный",
+                label: 'моторный',
+                value: 'моторный'
               },
               {
-                label: "не моторный",
-                value: "не моторный",
-              },
-            ],
+                label: 'не моторный',
+                value: 'не моторный'
+              }
+            ]
           },
           {
             label:
-              "билатеральный тонико-клонический приступ с фокальным дебютом",
+              'билатеральный тонико-клонический приступ с фокальным дебютом',
             value:
-              "билатеральный тонико-клонический приступ с фокальным дебютом",
-          },
-        ],
+              'билатеральный тонико-клонический приступ с фокальным дебютом'
+          }
+        ]
       },
       {
-        label: "генерализованное начало",
-        value: "генерализованное начало",
+        label: 'генерализованное начало',
+        value: 'генерализованное начало',
         options: [
           {
-            label: "моторный",
-            value: "моторный",
+            label: 'моторный',
+            value: 'моторный',
             isCheckbox: true,
             options: [
               {
-                label: "тонико-клонический приступ",
-                value: "тонико-клонический приступ",
+                label: 'тонико-клонический приступ',
+                value: 'тонико-клонический приступ'
               },
               {
-                label: "другие моторные приступы",
-                value: "другие моторные приступы",
-              },
-            ],
+                label: 'другие моторные приступы',
+                value: 'другие моторные приступы'
+              }
+            ]
           },
           {
-            label: "не моторный",
-            value: "не моторный",
+            label: 'не моторный',
+            value: 'не моторный',
             isCheckbox: true,
             options: [
               {
-                label: " абсансный приступ",
-                value: " абсансный приступ",
-              },
-            ],
-          },
-        ],
+                label: ' абсансный приступ',
+                value: ' абсансный приступ'
+              }
+            ]
+          }
+        ]
       },
       {
-        label: "приступ с неизвестным началом",
-        value: "приступ с неизвестным началом",
+        label: 'приступ с неизвестным началом',
+        value: 'приступ с неизвестным началом',
         options: [
           {
-            label: "моторный",
-            value: "моторный",
+            label: 'моторный',
+            value: 'моторный'
           },
           {
-            label: "не моторный",
-            value: "не моторный",
+            label: 'не моторный',
+            value: 'не моторный'
           },
           {
-            label: "не классифицируемый",
-            value: "не классифицируемый",
-          },
-        ],
-      },
-    ],
+            label: 'не классифицируемый',
+            value: 'не классифицируемый'
+          }
+        ]
+      }
+    ]
   },
   {
-    name: "epilepsyType",
-    label: "Тип эпилепсий",
-    type: "options",
+    name: 'epilepsyType',
+    label: 'Тип эпилепсий',
+    type: 'options',
     options: [
       {
-        label: "фокальная",
-        value: "фокальная",
+        label: 'фокальная',
+        value: 'фокальная'
       },
       {
-        label: "генерализованная",
-        value: "генерализованная",
+        label: 'генерализованная',
+        value: 'генерализованная'
       },
       {
-        label: "комбинированная",
-        value: "комбинированная",
+        label: 'комбинированная',
+        value: 'комбинированная'
       },
       {
-        label: "неуточненная",
-        value: "неуточненная",
-      },
-    ],
+        label: 'неуточненная',
+        value: 'неуточненная'
+      }
+    ]
   },
   {
-    name: "icd",
-    label: "МКБ-10",
-    type: "options",
+    name: 'icd',
+    label: 'МКБ-10',
+    type: 'options',
     options: [
       {
-        label: "G40.1",
-        value: "G40.1",
+        label: 'G40.1',
+        value: 'G40.1'
       },
       {
-        label: "G40.2",
-        value: "G40.2",
+        label: 'G40.2',
+        value: 'G40.2'
       },
       {
-        label: "G40.3",
-        value: "G40.3",
+        label: 'G40.3',
+        value: 'G40.3'
       },
       {
-        label: "G40.4",
-        value: "G40.4",
+        label: 'G40.4',
+        value: 'G40.4'
       },
       {
-        label: "G40.5",
-        value: "G40.5",
+        label: 'G40.5',
+        value: 'G40.5'
       },
       {
-        label: "G40.6",
-        value: "G40.6",
+        label: 'G40.6',
+        value: 'G40.6'
       },
       {
-        label: "G40.7",
-        value: "G40.7",
+        label: 'G40.7',
+        value: 'G40.7'
       },
       {
-        label: "G40.8",
-        value: "G40.8",
+        label: 'G40.8',
+        value: 'G40.8'
       },
       {
-        label: "G40.9",
-        value: "G40.9",
+        label: 'G40.9',
+        value: 'G40.9'
       },
       {
-        label: "G40.9",
-        value: "G40.9",
+        label: 'G40.9',
+        value: 'G40.9'
       },
       {
-        label: "G41.1",
-        value: "G41.1",
+        label: 'G41.1',
+        value: 'G41.1'
       },
       {
-        label: "G41.2",
-        value: "G41.2",
+        label: 'G41.2',
+        value: 'G41.2'
       },
       {
-        label: "G41.8",
-        value: "G41.8",
+        label: 'G41.8',
+        value: 'G41.8'
       },
       {
-        label: "G41.9",
-        value: "G41.9",
+        label: 'G41.9',
+        value: 'G41.9'
       },
       {
-        label: "Другое",
-        value: "Другое",
-        isOther: true,
-      },
-    ],
+        label: 'Другое',
+        value: 'Другое',
+        isOther: true
+      }
+    ]
   },
   {
-    name: "durationOfTheAttack",
-    label: "Длительность приступа",
-    type: "options",
+    name: 'durationOfTheAttack',
+    label: 'Длительность приступа',
+    type: 'options',
     options: [
       {
-        label: "до 30 сек",
-        value: "до 30 сек",
+        label: 'до 30 сек',
+        value: 'до 30 сек'
       },
       {
-        label: "до 1 мин",
-        value: "до 1 мин",
+        label: 'до 1 мин',
+        value: 'до 1 мин'
       },
       {
-        label: "1-5 мин",
-        value: "1-5 мин",
+        label: '1-5 мин',
+        value: '1-5 мин'
       },
       {
-        label: "5-10 мин",
-        value: "5-10 мин",
+        label: '5-10 мин',
+        value: '5-10 мин'
       },
       {
-        label: ">10 мин",
-        value: ">10 мин",
-      },
-    ],
+        label: '>10 мин',
+        value: '>10 мин'
+      }
+    ]
   },
   {
-    name: "featuresOfSeizures",
-    label: "Особенности приступов",
-    type: "multioptions",
+    name: 'featuresOfSeizures',
+    label: 'Особенности приступов',
+    type: 'multioptions',
     options: [
       {
-        label: "только дневные",
-        value: "только дневные",
+        label: 'только дневные',
+        value: 'только дневные'
       },
       {
-        label: "только ночные",
-        value: "только ночные",
+        label: 'только ночные',
+        value: 'только ночные'
       },
       {
-        label: "рефлекторные приступы (стартл эпилепсии)",
-        value: "рефлекторные приступы (стартл эпилепсии)",
+        label: 'рефлекторные приступы (стартл эпилепсии)',
+        value: 'рефлекторные приступы (стартл эпилепсии)',
         isCheckbox: true,
         options: [
           {
-            label: "фотосенситивные",
-            value: "фотосенситивные",
+            label: 'фотосенситивные',
+            value: 'фотосенситивные'
           },
           {
-            label: "чтение",
-            value: "чтение",
+            label: 'чтение',
+            value: 'чтение'
           },
           {
-            label: "шум/громкий звук/музыка",
-            value: "шум/громкий звук/музыка",
+            label: 'шум/громкий звук/музыка',
+            value: 'шум/громкий звук/музыка'
           },
           {
-            label: "прикосновение/контакт",
-            value: "прикосновение/контакт",
+            label: 'прикосновение/контакт',
+            value: 'прикосновение/контакт'
           },
           {
-            label: "холод/горящий",
-            value: "холод/горящий",
-          },
-        ],
+            label: 'холод/горящий',
+            value: 'холод/горящий'
+          }
+        ]
       },
       {
-        label: "приступы перед/во время менструального цикла",
-        value: "приступы перед/во время менструального цикла",
-      },
-    ],
-  },
-];
+        label: 'приступы перед/во время менструального цикла',
+        value: 'приступы перед/во время менструального цикла'
+      }
+    ]
+  }
+]
 
 const formFieldAnticonvulsantDrugs: FormField[] = [
   {
-    name: "inTheDebut",
-    label: "В дебюте",
-    type: "options",
+    name: 'inTheDebut',
+    label: 'В дебюте',
+    type: 'options',
     options: [
       {
-        label: "Вальпроаты",
-        value: "Вальпроаты",
+        label: 'Вальпроаты',
+        value: 'Вальпроаты'
       },
       {
-        label: "Вальпроевая кислота",
-        value: "Вальпроевая кислота",
+        label: 'Вальпроевая кислота',
+        value: 'Вальпроевая кислота'
       },
       {
-        label: "Карбамазепин",
-        value: "Карбамазепин",
+        label: 'Карбамазепин',
+        value: 'Карбамазепин'
       },
       {
-        label: "Ламотриджин",
-        value: "Ламотриджин",
+        label: 'Ламотриджин',
+        value: 'Ламотриджин'
       },
       {
-        label: "Леветирацетам",
-        value: "Леветирацетам",
+        label: 'Леветирацетам',
+        value: 'Леветирацетам'
       },
       {
-        label: "Топиромат",
-        value: "Топиромат",
+        label: 'Топиромат',
+        value: 'Топиромат'
       },
       {
-        label: "Окскарбазепин",
-        value: "Окскарбазепин",
+        label: 'Окскарбазепин',
+        value: 'Окскарбазепин'
       },
       {
-        label: "Фенобарбитал",
-        value: "Фенобарбитал",
+        label: 'Фенобарбитал',
+        value: 'Фенобарбитал'
       },
       {
-        label: "Другое",
-        value: "Другое",
-        isOther: true,
-      },
-    ],
+        label: 'Другое',
+        value: 'Другое',
+        isOther: true
+      }
+    ]
   },
 
   /*
@@ -2196,112 +2195,112 @@ const formFieldAnticonvulsantDrugs: FormField[] = [
 
   //ПОСЛЕДУЮЩАЯ ТЕРАПИЯ
   {
-    name: "followUpTherapy",
-    label: "Последующая терапия",
-    type: "options",
+    name: 'followUpTherapy',
+    label: 'Последующая терапия',
+    type: 'options',
     options: [
       {
-        label: "Вальпроаты",
-        value: "Вальпроаты",
+        label: 'Вальпроаты',
+        value: 'Вальпроаты'
       },
       {
-        label: "Вальпроевая кислота",
-        value: "Вальпроевая кислота",
+        label: 'Вальпроевая кислота',
+        value: 'Вальпроевая кислота'
       },
       {
-        label: "Карбамазепин",
-        value: "Карбамазепин",
+        label: 'Карбамазепин',
+        value: 'Карбамазепин'
       },
       {
-        label: "Ламотриджин",
-        value: "Ламотриджин",
+        label: 'Ламотриджин',
+        value: 'Ламотриджин'
       },
       {
-        label: "Леветирацетам",
-        value: "Леветирацетам",
+        label: 'Леветирацетам',
+        value: 'Леветирацетам'
       },
       {
-        label: "Топиромат",
-        value: "Топиромат",
+        label: 'Топиромат',
+        value: 'Топиромат'
       },
       {
-        label: "Окскарбазепин",
-        value: "Окскарбазепин",
+        label: 'Окскарбазепин',
+        value: 'Окскарбазепин'
       },
       {
-        label: "Фенобарбитал",
-        value: "Фенобарбитал",
+        label: 'Фенобарбитал',
+        value: 'Фенобарбитал'
       },
       {
-        label: "Вигабатрин",
-        value: "Вигабатрин",
+        label: 'Вигабатрин',
+        value: 'Вигабатрин'
       },
       {
-        label: "Этосуксимид",
-        value: "Этосуксимид",
+        label: 'Этосуксимид',
+        value: 'Этосуксимид'
       },
       {
-        label: "Перампанел",
-        value: "Перампанел",
+        label: 'Перампанел',
+        value: 'Перампанел'
       },
       {
-        label: "АКТГ",
-        value: "АКТГ",
+        label: 'АКТГ',
+        value: 'АКТГ'
       },
       {
-        label: "Гидрокортизон",
-        value: "Гидрокортизон",
+        label: 'Гидрокортизон',
+        value: 'Гидрокортизон'
       },
       {
-        label: "Зонисамид",
-        value: "Зонисамид",
+        label: 'Зонисамид',
+        value: 'Зонисамид'
       },
       {
-        label: "Лакосамид",
-        value: "Лакосамид",
+        label: 'Лакосамид',
+        value: 'Лакосамид'
       },
       {
-        label: "Сультиам",
-        value: "Сультиам",
+        label: 'Сультиам',
+        value: 'Сультиам'
       },
       {
-        label: "Руфинамид",
-        value: "Руфинамид",
+        label: 'Руфинамид',
+        value: 'Руфинамид'
       },
       {
-        label: "Клоназепам",
-        value: "Клоназепам",
+        label: 'Клоназепам',
+        value: 'Клоназепам'
       },
       {
-        label: "Клобазам",
-        value: "Клобазам",
+        label: 'Клобазам',
+        value: 'Клобазам'
       },
       {
-        label: "Диазепам",
-        value: "Диазепам",
+        label: 'Диазепам',
+        value: 'Диазепам'
       },
       {
-        label: "Габапентин",
-        value: "Габапентин",
+        label: 'Габапентин',
+        value: 'Габапентин'
       },
       {
-        label: "Прегабалин",
-        value: "Прегабалин",
+        label: 'Прегабалин',
+        value: 'Прегабалин'
       },
       {
-        label: "Стирипентол",
-        value: "Стирипентол",
+        label: 'Стирипентол',
+        value: 'Стирипентол'
       },
       {
-        label: "Фенитоин",
-        value: "Фенитоин",
+        label: 'Фенитоин',
+        value: 'Фенитоин'
       },
       {
-        label: "Другое",
-        value: "Другое",
-        isOther: true,
-      },
-    ],
+        label: 'Другое',
+        value: 'Другое',
+        isOther: true
+      }
+    ]
   },
   /*
   {
@@ -2743,1405 +2742,1405 @@ const formFieldAnticonvulsantDrugs: FormField[] = [
 
   //ТЕКУЩАЯ ТЕРАПИЯ
   {
-    name: "currentTherapy",
-    label: "Текущая терапия",
-    type: "options",
+    name: 'currentTherapy',
+    label: 'Текущая терапия',
+    type: 'options',
     options: [
       {
-        label: "Вальпроаты",
-        value: "Вальпроаты",
+        label: 'Вальпроаты',
+        value: 'Вальпроаты'
       },
       {
-        label: "Вальпроевая кислота",
-        value: "Вальпроевая кислота",
+        label: 'Вальпроевая кислота',
+        value: 'Вальпроевая кислота'
       },
       {
-        label: "Карбамазепин",
-        value: "Карбамазепин",
+        label: 'Карбамазепин',
+        value: 'Карбамазепин'
       },
       {
-        label: "Ламотриджин",
-        value: "Ламотриджин",
+        label: 'Ламотриджин',
+        value: 'Ламотриджин'
       },
       {
-        label: "Леветирацетам",
-        value: "Леветирацетам",
+        label: 'Леветирацетам',
+        value: 'Леветирацетам'
       },
       {
-        label: "Топиромат",
-        value: "Топиромат",
+        label: 'Топиромат',
+        value: 'Топиромат'
       },
       {
-        label: "Окскарбазепин",
-        value: "Окскарбазепин",
+        label: 'Окскарбазепин',
+        value: 'Окскарбазепин'
       },
       {
-        label: "Фенобарбитал",
-        value: "Фенобарбитал",
+        label: 'Фенобарбитал',
+        value: 'Фенобарбитал'
       },
       {
-        label: "Вигабатрин",
-        value: "Вигабатрин",
+        label: 'Вигабатрин',
+        value: 'Вигабатрин'
       },
       {
-        label: "Этосуксимид",
-        value: "Этосуксимид",
+        label: 'Этосуксимид',
+        value: 'Этосуксимид'
       },
       {
-        label: "Перампанел",
-        value: "Перампанел",
+        label: 'Перампанел',
+        value: 'Перампанел'
       },
       {
-        label: "АКТГ",
-        value: "АКТГ",
+        label: 'АКТГ',
+        value: 'АКТГ'
       },
       {
-        label: "Гидрокортизон",
-        value: "Гидрокортизон",
+        label: 'Гидрокортизон',
+        value: 'Гидрокортизон'
       },
       {
-        label: "Зонисамид",
-        value: "Зонисамид",
+        label: 'Зонисамид',
+        value: 'Зонисамид'
       },
       {
-        label: "Лакосамид",
-        value: "Лакосамид",
+        label: 'Лакосамид',
+        value: 'Лакосамид'
       },
       {
-        label: "Сультиам",
-        value: "Сультиам",
+        label: 'Сультиам',
+        value: 'Сультиам'
       },
       {
-        label: "Руфинамид",
-        value: "Руфинамид",
+        label: 'Руфинамид',
+        value: 'Руфинамид'
       },
       {
-        label: "Клоназепам",
-        value: "Клоназепам",
+        label: 'Клоназепам',
+        value: 'Клоназепам'
       },
       {
-        label: "Клобазам",
-        value: "Клобазам",
+        label: 'Клобазам',
+        value: 'Клобазам'
       },
       {
-        label: "Диазепам",
-        value: "Диазепам",
+        label: 'Диазепам',
+        value: 'Диазепам'
       },
       {
-        label: "Габапентин",
-        value: "Габапентин",
+        label: 'Габапентин',
+        value: 'Габапентин'
       },
       {
-        label: "Прегабалин",
-        value: "Прегабалин",
+        label: 'Прегабалин',
+        value: 'Прегабалин'
       },
       {
-        label: "Стирипентол",
-        value: "Стирипентол",
+        label: 'Стирипентол',
+        value: 'Стирипентол'
       },
       {
-        label: "Фенитоин",
-        value: "Фенитоин",
+        label: 'Фенитоин',
+        value: 'Фенитоин'
       },
       {
-        label: "Другое",
-        value: "Другое",
-        isOther: true,
-      },
-    ],
+        label: 'Другое',
+        value: 'Другое',
+        isOther: true
+      }
+    ]
   },
 
   {
-    name: "healTypes",
-    label: "Типы лечения:",
-    type: "options",
+    name: 'healTypes',
+    label: 'Типы лечения:',
+    type: 'options',
     options: [
       {
-        label: "монотерапия",
-        value: "монотерапия",
+        label: 'монотерапия',
+        value: 'монотерапия'
       },
       {
-        label: "битерапия",
-        value: "битерапия",
+        label: 'битерапия',
+        value: 'битерапия'
       },
       {
-        label: "политерапия",
-        value: "политерапия",
-      },
-    ],
+        label: 'политерапия',
+        value: 'политерапия'
+      }
+    ]
   },
   {
-    name: "effectivenessGrade",
-    label: "Оценка эффективности:",
-    type: "options",
+    name: 'effectivenessGrade',
+    label: 'Оценка эффективности:',
+    type: 'options',
     options: [
       {
-        label: "частые приступы (приступы раз в 1-3 мес)",
-        value: "частые приступы (приступы раз в 1-3 мес)",
+        label: 'частые приступы (приступы раз в 1-3 мес)',
+        value: 'частые приступы (приступы раз в 1-3 мес)'
       },
       {
-        label: "редкие приступы (раз в 3-9 мес)",
-        value: "редкие приступы (раз в 3-9 мес)",
+        label: 'редкие приступы (раз в 3-9 мес)',
+        value: 'редкие приступы (раз в 3-9 мес)'
       },
       {
-        label: "ремиссия (12 мес и более нет приступов)",
-        value: "ремиссия (12 мес и более нет приступов)",
+        label: 'ремиссия (12 мес и более нет приступов)',
+        value: 'ремиссия (12 мес и более нет приступов)'
       },
       {
         label:
-          "стадия разрешения (после отмены препаратов приступы не повторились)",
+          'стадия разрешения (после отмены препаратов приступы не повторились)',
         value:
-          "стадия разрешения (после отмены препаратов приступы не повторились)",
-      },
-    ],
-  },
-];
+          'стадия разрешения (после отмены препаратов приступы не повторились)'
+      }
+    ]
+  }
+]
 
 const formFieldInstrumentalResearch: FormField[] = [
   {
-    name: "typesOfEEG",
-    label: "Виды ЭЭГ",
-    type: "options",
+    name: 'typesOfEEG',
+    label: 'Виды ЭЭГ',
+    type: 'options',
     options: [
       {
-        label: "рутинная",
-        value: "рутинная",
+        label: 'рутинная',
+        value: 'рутинная'
       },
       {
-        label: "амбулаторная (от 1 до 12 часов)",
-        value: "амбулаторная (от 1 до 12 часов)",
+        label: 'амбулаторная (от 1 до 12 часов)',
+        value: 'амбулаторная (от 1 до 12 часов)'
       },
       {
-        label: "длительная ЭЭГ (от 12 ч до несколько дней)",
-        value: "длительная ЭЭГ (от 12 ч до несколько дней)",
-      },
-    ],
+        label: 'длительная ЭЭГ (от 12 ч до несколько дней)',
+        value: 'длительная ЭЭГ (от 12 ч до несколько дней)'
+      }
+    ]
   },
   {
-    name: "resultOfInterictalEEG",
-    label: "Результат интериктального ЭЭГ",
-    type: "multioptions",
+    name: 'resultOfInterictalEEG',
+    label: 'Результат интериктального ЭЭГ',
+    type: 'multioptions',
     options: [
       {
-        label: "норма",
-        value: "норма",
+        label: 'норма',
+        value: 'норма'
       },
       {
-        label: "патологический",
-        value: "патологический",
+        label: 'патологический',
+        value: 'патологический',
         options: [
           {
-            label: "специфические",
-            value: "специфические",
+            label: 'специфические',
+            value: 'специфические',
             options: [
               {
-                label: "острая/спайк волна",
-                value: "острая/спайк волна",
+                label: 'острая/спайк волна',
+                value: 'острая/спайк волна',
                 options: [
                   {
-                    label: "справа",
-                    value: "справа",
+                    label: 'справа',
+                    value: 'справа',
                     isCheckbox: true,
                     options: [
                       {
-                        label: "Лобная",
-                        value: "Лобная",
+                        label: 'Лобная',
+                        value: 'Лобная'
                       },
                       {
-                        label: "Центральная",
-                        value: "Центральная",
+                        label: 'Центральная',
+                        value: 'Центральная'
                       },
                       {
-                        label: "Теменная",
-                        value: "Теменная",
+                        label: 'Теменная',
+                        value: 'Теменная'
                       },
                       {
-                        label: "Затылочная",
-                        value: "Затылочная",
+                        label: 'Затылочная',
+                        value: 'Затылочная'
                       },
                       {
-                        label: "Височная",
-                        value: "Височная",
+                        label: 'Височная',
+                        value: 'Височная'
                       },
                       {
-                        label: "Комбинированный",
-                        value: "Комбинированный",
-                      },
-                    ],
+                        label: 'Комбинированный',
+                        value: 'Комбинированный'
+                      }
+                    ]
                   },
                   {
-                    label: "слева",
-                    value: "слева",
+                    label: 'слева',
+                    value: 'слева',
                     isCheckbox: true,
                     options: [
                       {
-                        label: "Лобная",
-                        value: "Лобная",
+                        label: 'Лобная',
+                        value: 'Лобная'
                       },
                       {
-                        label: "Центральная",
-                        value: "Центральная",
+                        label: 'Центральная',
+                        value: 'Центральная'
                       },
                       {
-                        label: "Теменная",
-                        value: "Теменная",
+                        label: 'Теменная',
+                        value: 'Теменная'
                       },
                       {
-                        label: "Затылочная",
-                        value: "Затылочная",
+                        label: 'Затылочная',
+                        value: 'Затылочная'
                       },
                       {
-                        label: "Височная",
-                        value: "Височная",
+                        label: 'Височная',
+                        value: 'Височная'
                       },
                       {
-                        label: "Комбинированный",
-                        value: "Комбинированный",
-                      },
-                    ],
+                        label: 'Комбинированный',
+                        value: 'Комбинированный'
+                      }
+                    ]
                   },
                   {
-                    label: "билатерально",
-                    value: "билатерально",
+                    label: 'билатерально',
+                    value: 'билатерально',
                     isCheckbox: true,
                     options: [
                       {
-                        label: "Лобная",
-                        value: "Лобная",
+                        label: 'Лобная',
+                        value: 'Лобная'
                       },
                       {
-                        label: "Центральная",
-                        value: "Центральная",
+                        label: 'Центральная',
+                        value: 'Центральная'
                       },
                       {
-                        label: "Теменная",
-                        value: "Теменная",
+                        label: 'Теменная',
+                        value: 'Теменная'
                       },
                       {
-                        label: "Затылочная",
-                        value: "Затылочная",
+                        label: 'Затылочная',
+                        value: 'Затылочная'
                       },
                       {
-                        label: "Височная",
-                        value: "Височная",
+                        label: 'Височная',
+                        value: 'Височная'
                       },
                       {
-                        label: "Комбинированный",
-                        value: "Комбинированный",
-                      },
-                    ],
-                  },
-                ],
+                        label: 'Комбинированный',
+                        value: 'Комбинированный'
+                      }
+                    ]
+                  }
+                ]
               },
               {
-                label: "спайк/острая-медленная волна",
-                value: "спайк/острая-медленная волна",
+                label: 'спайк/острая-медленная волна',
+                value: 'спайк/острая-медленная волна',
                 options: [
                   {
-                    label: "справа",
-                    value: "справа",
+                    label: 'справа',
+                    value: 'справа',
                     isCheckbox: true,
                     options: [
                       {
-                        label: "Лобная",
-                        value: "Лобная",
+                        label: 'Лобная',
+                        value: 'Лобная'
                       },
                       {
-                        label: "Центральная",
-                        value: "Центральная",
+                        label: 'Центральная',
+                        value: 'Центральная'
                       },
                       {
-                        label: "Теменная",
-                        value: "Теменная",
+                        label: 'Теменная',
+                        value: 'Теменная'
                       },
                       {
-                        label: "Затылочная",
-                        value: "Затылочная",
+                        label: 'Затылочная',
+                        value: 'Затылочная'
                       },
                       {
-                        label: "Височная",
-                        value: "Височная",
+                        label: 'Височная',
+                        value: 'Височная'
                       },
                       {
-                        label: "Комбинированный",
-                        value: "Комбинированный",
-                      },
-                    ],
+                        label: 'Комбинированный',
+                        value: 'Комбинированный'
+                      }
+                    ]
                   },
                   {
-                    label: "слева",
-                    value: "слева",
+                    label: 'слева',
+                    value: 'слева',
                     isCheckbox: true,
                     options: [
                       {
-                        label: "Лобная",
-                        value: "Лобная",
+                        label: 'Лобная',
+                        value: 'Лобная'
                       },
                       {
-                        label: "Центральная",
-                        value: "Центральная",
+                        label: 'Центральная',
+                        value: 'Центральная'
                       },
                       {
-                        label: "Теменная",
-                        value: "Теменная",
+                        label: 'Теменная',
+                        value: 'Теменная'
                       },
                       {
-                        label: "Затылочная",
-                        value: "Затылочная",
+                        label: 'Затылочная',
+                        value: 'Затылочная'
                       },
                       {
-                        label: "Височная",
-                        value: "Височная",
+                        label: 'Височная',
+                        value: 'Височная'
                       },
                       {
-                        label: "Комбинированный",
-                        value: "Комбинированный",
-                      },
-                    ],
+                        label: 'Комбинированный',
+                        value: 'Комбинированный'
+                      }
+                    ]
                   },
                   {
-                    label: "билатерально",
-                    value: "билатерально",
+                    label: 'билатерально',
+                    value: 'билатерально',
                     isCheckbox: true,
                     options: [
                       {
-                        label: "Лобная",
-                        value: "Лобная",
+                        label: 'Лобная',
+                        value: 'Лобная'
                       },
                       {
-                        label: "Центральная",
-                        value: "Центральная",
+                        label: 'Центральная',
+                        value: 'Центральная'
                       },
                       {
-                        label: "Теменная",
-                        value: "Теменная",
+                        label: 'Теменная',
+                        value: 'Теменная'
                       },
                       {
-                        label: "Затылочная",
-                        value: "Затылочная",
+                        label: 'Затылочная',
+                        value: 'Затылочная'
                       },
                       {
-                        label: "Височная",
-                        value: "Височная",
+                        label: 'Височная',
+                        value: 'Височная'
                       },
                       {
-                        label: "Комбинированный",
-                        value: "Комбинированный",
-                      },
-                    ],
-                  },
-                ],
+                        label: 'Комбинированный',
+                        value: 'Комбинированный'
+                      }
+                    ]
+                  }
+                ]
               },
               {
-                label: "генерализованная спайк-медленная волна 3-4 Гц",
-                value: "генерализованная спайк-медленная волна 3-4 Гц",
+                label: 'генерализованная спайк-медленная волна 3-4 Гц',
+                value: 'генерализованная спайк-медленная волна 3-4 Гц'
               },
               {
-                label: "генерализованная спайк-медленная волна 4-6 Гц",
-                value: "генерализованная спайк-медленная волна 4-6 Гц",
+                label: 'генерализованная спайк-медленная волна 4-6 Гц',
+                value: 'генерализованная спайк-медленная волна 4-6 Гц'
               },
               {
-                label: "генерализованная спайк-медленная волна <3 Гц",
-                value: "генерализованная спайк-медленная волна <3 Гц",
+                label: 'генерализованная спайк-медленная волна <3 Гц',
+                value: 'генерализованная спайк-медленная волна <3 Гц'
               },
               {
-                label: "генерализованная полиспайк-медленная волна",
-                value: "генерализованная полиспайк-медленная волна",
+                label: 'генерализованная полиспайк-медленная волна',
+                value: 'генерализованная полиспайк-медленная волна'
               },
               {
                 label:
-                  "латерализованная эпилептиформная активность (справа или слева)",
+                  'латерализованная эпилептиформная активность (справа или слева)',
                 value:
-                  "латерализованная эпилептиформная активность (справа или слева)",
+                  'латерализованная эпилептиформная активность (справа или слева)'
               },
               {
-                label: "фотопароксизмальный ответ – тип 1, тип 2, тип 3, тип 4",
-                value: "фотопароксизмальный ответ – тип 1, тип 2, тип 3, тип 4",
+                label: 'фотопароксизмальный ответ – тип 1, тип 2, тип 3, тип 4',
+                value: 'фотопароксизмальный ответ – тип 1, тип 2, тип 3, тип 4'
               },
               {
-                label: "вторичная генерализованная эпилептиформная активность",
-                value: "вторичная генерализованная эпилептиформная активность",
+                label: 'вторичная генерализованная эпилептиформная активность',
+                value: 'вторичная генерализованная эпилептиформная активность'
               },
               {
                 label:
-                  "эпилептическая энцефалопатия с непрерывной спайк-волновой активностью во время сна (CSWS)",
+                  'эпилептическая энцефалопатия с непрерывной спайк-волновой активностью во время сна (CSWS)',
                 value:
-                  "эпилептическая энцефалопатия с непрерывной спайк-волновой активностью во время сна (CSWS)",
+                  'эпилептическая энцефалопатия с непрерывной спайк-волновой активностью во время сна (CSWS)'
               },
               {
-                label: "центро-темпоральные спайки",
-                value: "центро-темпоральные спайки",
-              },
-            ],
+                label: 'центро-темпоральные спайки',
+                value: 'центро-темпоральные спайки'
+              }
+            ]
           },
           {
-            label: "неспецифические",
-            value: "неспецифические",
+            label: 'неспецифические',
+            value: 'неспецифические',
             options: [
               {
-                label: "региональная полиморфная тета-дельта активность",
-                value: "региональная полиморфная тета-дельта активность",
+                label: 'региональная полиморфная тета-дельта активность',
+                value: 'региональная полиморфная тета-дельта активность',
                 options: [
                   {
-                    label: "непрерывная",
-                    value: "непрерывная",
+                    label: 'непрерывная',
+                    value: 'непрерывная',
                     options: [
                       {
-                        label: "справа",
-                        value: "справа",
+                        label: 'справа',
+                        value: 'справа',
                         isCheckbox: true,
                         options: [
                           {
-                            label: "Лобная",
-                            value: "Лобная",
+                            label: 'Лобная',
+                            value: 'Лобная'
                           },
                           {
-                            label: "Центральная",
-                            value: "Центральная",
+                            label: 'Центральная',
+                            value: 'Центральная'
                           },
                           {
-                            label: "Теменная",
-                            value: "Теменная",
+                            label: 'Теменная',
+                            value: 'Теменная'
                           },
                           {
-                            label: "Затылочная",
-                            value: "Затылочная",
+                            label: 'Затылочная',
+                            value: 'Затылочная'
                           },
                           {
-                            label: "Височная",
-                            value: "Височная",
+                            label: 'Височная',
+                            value: 'Височная'
                           },
                           {
-                            label: "Комбинированный",
-                            value: "Комбинированный",
-                          },
-                        ],
+                            label: 'Комбинированный',
+                            value: 'Комбинированный'
+                          }
+                        ]
                       },
                       {
-                        label: "слева",
-                        value: "слева",
+                        label: 'слева',
+                        value: 'слева',
                         isCheckbox: true,
                         options: [
                           {
-                            label: "Лобная",
-                            value: "Лобная",
+                            label: 'Лобная',
+                            value: 'Лобная'
                           },
                           {
-                            label: "Центральная",
-                            value: "Центральная",
+                            label: 'Центральная',
+                            value: 'Центральная'
                           },
                           {
-                            label: "Теменная",
-                            value: "Теменная",
+                            label: 'Теменная',
+                            value: 'Теменная'
                           },
                           {
-                            label: "Затылочная",
-                            value: "Затылочная",
+                            label: 'Затылочная',
+                            value: 'Затылочная'
                           },
                           {
-                            label: "Височная",
-                            value: "Височная",
+                            label: 'Височная',
+                            value: 'Височная'
                           },
                           {
-                            label: "Комбинированный",
-                            value: "Комбинированный",
-                          },
-                        ],
+                            label: 'Комбинированный',
+                            value: 'Комбинированный'
+                          }
+                        ]
                       },
                       {
-                        label: "билатерально",
-                        value: "билатерально",
+                        label: 'билатерально',
+                        value: 'билатерально',
                         isCheckbox: true,
                         options: [
                           {
-                            label: "Лобная",
-                            value: "Лобная",
+                            label: 'Лобная',
+                            value: 'Лобная'
                           },
                           {
-                            label: "Центральная",
-                            value: "Центральная",
+                            label: 'Центральная',
+                            value: 'Центральная'
                           },
                           {
-                            label: "Теменная",
-                            value: "Теменная",
+                            label: 'Теменная',
+                            value: 'Теменная'
                           },
                           {
-                            label: "Затылочная",
-                            value: "Затылочная",
+                            label: 'Затылочная',
+                            value: 'Затылочная'
                           },
                           {
-                            label: "Височная",
-                            value: "Височная",
+                            label: 'Височная',
+                            value: 'Височная'
                           },
                           {
-                            label: "Комбинированный",
-                            value: "Комбинированный",
-                          },
-                        ],
-                      },
-                    ],
+                            label: 'Комбинированный',
+                            value: 'Комбинированный'
+                          }
+                        ]
+                      }
+                    ]
                   },
                   {
-                    label: "прерывистая",
-                    value: "прерывистая",
+                    label: 'прерывистая',
+                    value: 'прерывистая',
                     options: [
                       {
-                        label: "FIRDA",
-                        value: "FIRDA",
+                        label: 'FIRDA',
+                        value: 'FIRDA'
                       },
                       {
-                        label: "TIRDA",
-                        value: "TIRDA",
+                        label: 'TIRDA',
+                        value: 'TIRDA'
                       },
                       {
-                        label: "OIRDA",
-                        value: "OIRDA",
-                      },
-                    ],
-                  },
-                ],
+                        label: 'OIRDA',
+                        value: 'OIRDA'
+                      }
+                    ]
+                  }
+                ]
               },
               {
-                label: "диффузная полиморфная тета-дельта активность",
-                value: "диффузная полиморфная тета-дельта активность",
+                label: 'диффузная полиморфная тета-дельта активность',
+                value: 'диффузная полиморфная тета-дельта активность'
               },
               {
-                label: "замедление фоновой активности",
-                value: "замедление фоновой активности",
+                label: 'замедление фоновой активности',
+                value: 'замедление фоновой активности'
               },
               {
-                label: "Трифазные волны",
-                value: "Трифазные волны",
+                label: 'Трифазные волны',
+                value: 'Трифазные волны'
               },
               {
-                label: "Усиленная бета активность",
-                value: "Усиленная бета активность",
+                label: 'Усиленная бета активность',
+                value: 'Усиленная бета активность'
               },
               {
-                label: "SREDA",
-                value: "SREDA",
-              },
-            ],
-          },
-        ],
-      },
-    ],
+                label: 'SREDA',
+                value: 'SREDA'
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
-    name: "prevalence",
-    label: "Распространённость",
-    type: "label",
+    name: 'prevalence',
+    label: 'Распространённость',
+    type: 'label'
   },
   {
-    name: "prevalenceResultOfInterictalEEG",
-    label: "Результат иктального ЭЭГ",
-    type: "multioptions",
+    name: 'prevalenceResultOfInterictalEEG',
+    label: 'Результат иктального ЭЭГ',
+    type: 'multioptions',
     options: [
       {
-        label: "Не инвазивный",
-        value: "Не инвазивный",
+        label: 'Не инвазивный',
+        value: 'Не инвазивный'
       },
       {
-        label: "Инвазивный",
-        value: "Инвазивный",
+        label: 'Инвазивный',
+        value: 'Инвазивный',
         options: [
           {
-            label: "Кортикография",
-            value: "Кортикография",
+            label: 'Кортикография',
+            value: 'Кортикография'
           },
           {
-            label: "Стерео ЭЭГ",
-            value: "Стерео ЭЭГ",
-          },
-        ],
-      },
-    ],
+            label: 'Стерео ЭЭГ',
+            value: 'Стерео ЭЭГ'
+          }
+        ]
+      }
+    ]
   },
   {
-    name: "localization",
-    label: "Локализация",
-    type: "multioptions",
+    name: 'localization',
+    label: 'Локализация',
+    type: 'multioptions',
     options: [
       {
-        label: "локализация",
-        value: "локализация",
+        label: 'локализация',
+        value: 'локализация',
         isCheckbox: true,
         options: [
           {
-            label: "1",
-            value: "1",
+            label: '1',
+            value: '1',
             options: [
               {
-                label: "Лобная",
-                value: "Лобная",
+                label: 'Лобная',
+                value: 'Лобная'
               },
               {
-                label: "лобно-полюсная",
-                value: "лобно-полюсная",
+                label: 'лобно-полюсная',
+                value: 'лобно-полюсная'
               },
               {
-                label: "лобно-центральный",
-                value: "лобно-центральный",
+                label: 'лобно-центральный',
+                value: 'лобно-центральный'
               },
               {
-                label: "лобно-сагиттальный",
-                value: "лобно-сагиттальный",
+                label: 'лобно-сагиттальный',
+                value: 'лобно-сагиттальный'
               },
               {
-                label: "лобно-латеральный",
-                value: "лобно-латеральный",
+                label: 'лобно-латеральный',
+                value: 'лобно-латеральный'
               },
               {
-                label: "лобно-височный",
-                value: "лобно-височный",
-              },
-            ],
+                label: 'лобно-височный',
+                value: 'лобно-височный'
+              }
+            ]
           },
           {
-            label: "2",
-            value: "2",
+            label: '2',
+            value: '2',
             options: [
               {
-                label: "Центральный",
-                value: "Центральный",
+                label: 'Центральный',
+                value: 'Центральный'
               },
               {
-                label: "Центрально-сагиттальный",
-                value: "Центрально-сагиттальный",
-              },
-            ],
+                label: 'Центрально-сагиттальный',
+                value: 'Центрально-сагиттальный'
+              }
+            ]
           },
           {
-            label: "3",
-            value: "3",
+            label: '3',
+            value: '3',
             options: [
               {
-                label: "теменная",
-                value: "теменная",
+                label: 'теменная',
+                value: 'теменная'
               },
               {
-                label: "теменно-сагиттальный",
-                value: "теменно-сагиттальный",
+                label: 'теменно-сагиттальный',
+                value: 'теменно-сагиттальный'
               },
               {
-                label: "теменно-затылочный",
-                value: "теменно-затылочный",
-              },
-            ],
+                label: 'теменно-затылочный',
+                value: 'теменно-затылочный'
+              }
+            ]
           },
           {
-            label: "4",
-            value: "4",
+            label: '4',
+            value: '4',
             options: [
               {
-                label: "затылочный",
-                value: "затылочный",
-              },
-            ],
+                label: 'затылочный',
+                value: 'затылочный'
+              }
+            ]
           },
           {
-            label: "5",
-            value: "5",
+            label: '5',
+            value: '5',
             options: [
               {
-                label: "Височный",
-                value: "Височный",
+                label: 'Височный',
+                value: 'Височный'
               },
               {
-                label: "Передневисочный",
-                value: "Передневисочный",
+                label: 'Передневисочный',
+                value: 'Передневисочный'
               },
               {
-                label: "Средневисочный",
-                value: "Средневисочный",
+                label: 'Средневисочный',
+                value: 'Средневисочный'
               },
               {
-                label: "Теменно-височный",
-                value: "Теменно-височный",
+                label: 'Теменно-височный',
+                value: 'Теменно-височный'
               },
               {
-                label: "Затылочно-височный",
-                value: "Затылочно-височный",
-              },
-            ],
-          },
-        ],
-      },
-    ],
+                label: 'Затылочно-височный',
+                value: 'Затылочно-височный'
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
-    name: "types",
-    label: "Типы",
-    type: "options",
+    name: 'types',
+    label: 'Типы',
+    type: 'options',
     options: [
       {
-        label: "Ритмичное развитие тета-, дельта-, альфа-частот",
-        value: "Ритмичное развитие тета-, дельта-, альфа-частот",
+        label: 'Ритмичное развитие тета-, дельта-, альфа-частот',
+        value: 'Ритмичное развитие тета-, дельта-, альфа-частот'
       },
       {
-        label: "Ритмичные спайки",
-        value: "Ритмичные спайки",
+        label: 'Ритмичные спайки',
+        value: 'Ритмичные спайки'
       },
       {
-        label: "Спайк-медленная волна",
-        value: "Спайк-медленная волна",
+        label: 'Спайк-медленная волна',
+        value: 'Спайк-медленная волна'
       },
       {
         label:
-          "Электродекрементный (низкоамплитудная, высокочастотная активность)",
+          'Электродекрементный (низкоамплитудная, высокочастотная активность)',
         value:
-          "Электродекрементный (низкоамплитудная, высокочастотная активность)",
+          'Электродекрементный (низкоамплитудная, высокочастотная активность)'
       },
       {
         label:
-          "Клинический эпилептический приступ, но без четких изменений на ЭЭГ",
+          'Клинический эпилептический приступ, но без четких изменений на ЭЭГ',
         value:
-          "Клинический эпилептический приступ, но без четких изменений на ЭЭГ",
-      },
-    ],
+          'Клинический эпилептический приступ, но без четких изменений на ЭЭГ'
+      }
+    ]
   },
   {
-    name: "lateralization",
-    label: "Латерализация",
-    type: "options",
+    name: 'lateralization',
+    label: 'Латерализация',
+    type: 'options',
     options: [
       {
-        label: "справа",
-        value: "справа",
+        label: 'справа',
+        value: 'справа'
       },
       {
-        label: "слева",
-        value: "слева",
+        label: 'слева',
+        value: 'слева'
       },
       {
-        label: "билатеральный",
-        value: "билатеральный",
+        label: 'билатеральный',
+        value: 'билатеральный'
       },
       {
-        label: "сагиттальный",
-        value: "сагиттальный",
+        label: 'сагиттальный',
+        value: 'сагиттальный'
       },
       {
-        label: "не выполнено",
-        value: "не выполнено",
-      },
-    ],
-  },
-];
+        label: 'не выполнено',
+        value: 'не выполнено'
+      }
+    ]
+  }
+]
 
 const formFieldMRIResult: FormField[] = [
   {
-    name: "localizationnMRI",
-    label: "Локализация",
-    type: "multioptions",
+    name: 'localizationnMRI',
+    label: 'Локализация',
+    type: 'multioptions',
     options: [
       {
-        label: "Лобная доля",
-        value: "Лобная доля",
+        label: 'Лобная доля',
+        value: 'Лобная доля',
         isCheckbox: true,
         options: [
           {
-            label: "поясная извилина",
-            value: "поясная извилина",
+            label: 'поясная извилина',
+            value: 'поясная извилина'
           },
           {
-            label: "лобная оперкулуярная изв",
-            value: "лобная оперкулуярная изв",
+            label: 'лобная оперкулуярная изв',
+            value: 'лобная оперкулуярная изв'
           },
           {
-            label: "лобно-полюсная изв",
-            value: "лобно-полюсная изв",
+            label: 'лобно-полюсная изв',
+            value: 'лобно-полюсная изв'
           },
           {
-            label: "нижняя лобная изв",
-            value: "нижняя лобная изв",
+            label: 'нижняя лобная изв',
+            value: 'нижняя лобная изв'
           },
           {
-            label: "средняя лобная изв",
-            value: "средняя лобная изв",
+            label: 'средняя лобная изв',
+            value: 'средняя лобная изв'
           },
           {
-            label: "верхняя лобная изв",
-            value: "верхняя лобная изв",
+            label: 'верхняя лобная изв',
+            value: 'верхняя лобная изв'
           },
           {
-            label: "медиальная лобная изв",
-            value: "медиальная лобная изв",
+            label: 'медиальная лобная изв',
+            value: 'медиальная лобная изв'
           },
           {
-            label: "орбитофронтальная извилина",
-            value: "орбитофронтальная извилина",
+            label: 'орбитофронтальная извилина',
+            value: 'орбитофронтальная извилина'
           },
           {
-            label: "прецентральная извилина",
-            value: "прецентральная извилина",
+            label: 'прецентральная извилина',
+            value: 'прецентральная извилина'
           },
           {
-            label: "лобно-височная изв",
-            value: "лобно-височная изв",
+            label: 'лобно-височная изв',
+            value: 'лобно-височная изв'
           },
           {
-            label: "белое вещество – лобная",
-            value: "белое вещество – лобная",
+            label: 'белое вещество – лобная',
+            value: 'белое вещество – лобная'
           },
           {
-            label: "лобно-теменная изв",
-            value: "лобно-теменная изв",
-          },
-        ],
+            label: 'лобно-теменная изв',
+            value: 'лобно-теменная изв'
+          }
+        ]
       },
       {
-        label: "Височная доля",
-        value: "Височная доля",
+        label: 'Височная доля',
+        value: 'Височная доля',
         isCheckbox: true,
         options: [
           {
-            label: "амигдала/гиппокамп",
-            value: "амигдала/гиппокамп",
+            label: 'амигдала/гиппокамп',
+            value: 'амигдала/гиппокамп'
           },
           {
-            label: "нижняя височная изв",
-            value: "нижняя височная изв",
+            label: 'нижняя височная изв',
+            value: 'нижняя височная изв'
           },
           {
-            label: "средняя височная изв",
-            value: "средняя височная изв",
+            label: 'средняя височная изв',
+            value: 'средняя височная изв'
           },
           {
-            label: "верхняя височная изв",
-            value: "верхняя височная изв",
+            label: 'верхняя височная изв',
+            value: 'верхняя височная изв'
           },
           {
-            label: "крючок",
-            value: "крючок",
+            label: 'крючок',
+            value: 'крючок'
           },
           {
-            label: "парагиппокампальная изв",
-            value: "парагиппокампальная изв",
+            label: 'парагиппокампальная изв',
+            value: 'парагиппокампальная изв'
           },
           {
-            label: "височная оперкулярная изв",
-            value: "височная оперкулярная изв",
+            label: 'височная оперкулярная изв',
+            value: 'височная оперкулярная изв'
           },
           {
-            label: "поперечная височная изв",
-            value: "поперечная височная изв",
+            label: 'поперечная височная изв',
+            value: 'поперечная височная изв'
           },
           {
-            label: "височно-затылочная изв",
-            value: "височно-затылочная изв",
+            label: 'височно-затылочная изв',
+            value: 'височно-затылочная изв'
           },
           {
-            label: "височно-теменная изв",
-            value: "височно-теменная изв",
+            label: 'височно-теменная изв',
+            value: 'височно-теменная изв'
           },
           {
-            label: "белое вещество височной доли",
-            value: "белое вещество височной доли",
-          },
-        ],
+            label: 'белое вещество височной доли',
+            value: 'белое вещество височной доли'
+          }
+        ]
       },
       {
-        label: "Теменная доля",
-        value: "Теменная доля",
+        label: 'Теменная доля',
+        value: 'Теменная доля',
         isCheckbox: true,
         options: [
           {
-            label: "нижняя теменная доля",
-            value: "нижняя теменная доля",
+            label: 'нижняя теменная доля',
+            value: 'нижняя теменная доля'
           },
           {
-            label: "теменная оперкулярная изв",
-            value: "теменная оперкулярная изв",
+            label: 'теменная оперкулярная изв',
+            value: 'теменная оперкулярная изв'
           },
           {
-            label: "супрамаргинальная изв",
-            value: "супрамаргинальная изв",
+            label: 'супрамаргинальная изв',
+            value: 'супрамаргинальная изв'
           },
           {
-            label: "угловая извилина",
-            value: "угловая извилина",
+            label: 'угловая извилина',
+            value: 'угловая извилина'
           },
           {
-            label: "постцентральная изв",
-            value: "постцентральная изв",
+            label: 'постцентральная изв',
+            value: 'постцентральная изв'
           },
           {
-            label: "парацентральная доля",
-            value: "парацентральная доля",
+            label: 'парацентральная доля',
+            value: 'парацентральная доля'
           },
           {
-            label: "предклинье",
-            value: "предклинье",
+            label: 'предклинье',
+            value: 'предклинье'
           },
           {
-            label: "теменно-затылочная изв",
-            value: "теменно-затылочная изв",
+            label: 'теменно-затылочная изв',
+            value: 'теменно-затылочная изв'
           },
           {
-            label: "верхняя теменная доля",
-            value: "верхняя теменная доля",
+            label: 'верхняя теменная доля',
+            value: 'верхняя теменная доля'
           },
           {
-            label: "белое вещество теменной доли",
-            value: "белое вещество теменной доли",
+            label: 'белое вещество теменной доли',
+            value: 'белое вещество теменной доли'
           },
           {
-            label: "",
-            value: "",
-          },
-        ],
+            label: '',
+            value: ''
+          }
+        ]
       },
       {
-        label: "Затылочная доля",
-        value: "Затылочная доля",
+        label: 'Затылочная доля',
+        value: 'Затылочная доля',
         isCheckbox: true,
         options: [
           {
-            label: "клин",
-            value: "клин",
+            label: 'клин',
+            value: 'клин'
           },
           {
-            label: "латеральная затылочная изв",
-            value: "латеральная затылочная изв",
+            label: 'латеральная затылочная изв',
+            value: 'латеральная затылочная изв'
           },
           {
-            label: "лингвальная изв",
-            value: "лингвальная изв",
+            label: 'лингвальная изв',
+            value: 'лингвальная изв'
           },
           {
-            label: "затылочный полюс",
-            value: "затылочный полюс",
+            label: 'затылочный полюс',
+            value: 'затылочный полюс'
           },
           {
-            label: "верхняя затылочная изв",
-            value: "верхняя затылочная изв",
+            label: 'верхняя затылочная изв',
+            value: 'верхняя затылочная изв'
           },
           {
-            label: "белое вещество затылочной доли",
-            value: "белое вещество затылочной доли",
-          },
-        ],
+            label: 'белое вещество затылочной доли',
+            value: 'белое вещество затылочной доли'
+          }
+        ]
       },
       {
-        label: "Инсула",
-        value: "Инсула",
+        label: 'Инсула',
+        value: 'Инсула'
       },
       {
-        label: "Базальные ганглии",
-        value: "Базальные ганглии",
+        label: 'Базальные ганглии',
+        value: 'Базальные ганглии'
       },
       {
-        label: "Внутрижелудочковые/перивентрикулярные",
-        value: "Внутрижелудочковые/перивентрикулярные",
+        label: 'Внутрижелудочковые/перивентрикулярные',
+        value: 'Внутрижелудочковые/перивентрикулярные'
       },
       {
-        label: "Мозжечок",
-        value: "Мозжечок",
+        label: 'Мозжечок',
+        value: 'Мозжечок'
       },
       {
-        label: "Ствол мозга",
-        value: "Ствол мозга",
+        label: 'Ствол мозга',
+        value: 'Ствол мозга'
       },
       {
-        label: "Полушария г/м",
-        value: "Полушария г/м",
+        label: 'Полушария г/м',
+        value: 'Полушария г/м'
       },
       {
-        label: "Мозолистое тело",
-        value: "Мозолистое тело",
+        label: 'Мозолистое тело',
+        value: 'Мозолистое тело'
       },
       {
-        label: "Множественные узлы (больше 2х)",
-        value: "Множественные узлы (больше 2х)",
+        label: 'Множественные узлы (больше 2х)',
+        value: 'Множественные узлы (больше 2х)'
       },
       {
-        label: "Без патологии",
-        value: "Без патологии",
-      },
-    ],
+        label: 'Без патологии',
+        value: 'Без патологии'
+      }
+    ]
   },
   {
-    name: "lateralizationMRI",
-    label: "Латерализация",
-    type: "options",
+    name: 'lateralizationMRI',
+    label: 'Латерализация',
+    type: 'options',
     options: [
       {
-        label: "справа",
-        value: "справа",
+        label: 'справа',
+        value: 'справа'
       },
       {
-        label: "слева",
-        value: "слева",
+        label: 'слева',
+        value: 'слева'
       },
       {
-        label: "билатеральный",
-        value: "билатеральный",
+        label: 'билатеральный',
+        value: 'билатеральный'
       },
       {
-        label: "сагиттальный",
-        value: "сагиттальный",
+        label: 'сагиттальный',
+        value: 'сагиттальный'
       },
       {
-        label: "не выполнено",
-        value: "не выполнено",
-      },
-    ],
+        label: 'не выполнено',
+        value: 'не выполнено'
+      }
+    ]
   },
   {
-    name: "diagnosisMRI",
-    label: "Диагноз по МРТ",
-    type: "multioptions",
+    name: 'diagnosisMRI',
+    label: 'Диагноз по МРТ',
+    type: 'multioptions',
     options: [
       {
-        label: "Сосудистая мальформация",
-        value: "Сосудистая мальформация",
+        label: 'Сосудистая мальформация',
+        value: 'Сосудистая мальформация',
         options: [
           {
-            label: "АВМ",
-            value: "АВМ",
+            label: 'АВМ',
+            value: 'АВМ'
           },
           {
-            label: "кавернозная ангиома",
-            value: "кавернозная ангиома",
+            label: 'кавернозная ангиома',
+            value: 'кавернозная ангиома'
           },
           {
-            label: "врожденная венозная аномалия",
-            value: "врожденная венозная аномалия",
-          },
-        ],
+            label: 'врожденная венозная аномалия',
+            value: 'врожденная венозная аномалия'
+          }
+        ]
       },
       {
-        label: "После энцефалита (простой герпес)",
-        value: "После энцефалита (простой герпес)",
+        label: 'После энцефалита (простой герпес)',
+        value: 'После энцефалита (простой герпес)'
       },
       {
-        label: "Туберозный склероз",
-        value: "Туберозный склероз",
+        label: 'Туберозный склероз',
+        value: 'Туберозный склероз',
         options: [
           {
-            label: "кортикальные туберсы или гамартомы",
-            value: "кортикальные туберсы или гамартомы",
+            label: 'кортикальные туберсы или гамартомы',
+            value: 'кортикальные туберсы или гамартомы'
           },
           {
-            label: "туберозный склероз",
-            value: "туберозный склероз",
+            label: 'туберозный склероз',
+            value: 'туберозный склероз'
           },
           {
-            label: "нарушения в белом веществе",
-            value: "нарушения в белом веществе",
+            label: 'нарушения в белом веществе',
+            value: 'нарушения в белом веществе'
           },
           {
-            label: "субэпендимальная гигантоклеточная астроцитома",
-            value: "субэпендимальная гигантоклеточная астроцитома",
-          },
-        ],
+            label: 'субэпендимальная гигантоклеточная астроцитома',
+            value: 'субэпендимальная гигантоклеточная астроцитома'
+          }
+        ]
       },
       {
-        label: "Церебральная кортикальная дизгенезия",
-        value: "Церебральная кортикальная дизгенезия",
+        label: 'Церебральная кортикальная дизгенезия',
+        value: 'Церебральная кортикальная дизгенезия',
         options: [
           {
-            label: "ФКД",
-            value: "ФКД",
+            label: 'ФКД',
+            value: 'ФКД'
           },
           {
-            label: "гемимегалэнцефалия",
-            value: "гемимегалэнцефалия",
+            label: 'гемимегалэнцефалия',
+            value: 'гемимегалэнцефалия'
           },
           {
-            label: "фокальная субкортикальная гетеротопия",
-            value: "фокальная субкортикальная гетеротопия",
+            label: 'фокальная субкортикальная гетеротопия',
+            value: 'фокальная субкортикальная гетеротопия'
           },
           {
-            label: "полимикрогирия",
-            value: "полимикрогирия",
+            label: 'полимикрогирия',
+            value: 'полимикрогирия'
           },
           {
-            label: "лизэнцефалия",
-            value: "лизэнцефалия",
+            label: 'лизэнцефалия',
+            value: 'лизэнцефалия'
           },
           {
-            label: "субэпендимальная гетеротопия",
-            value: "субэпендимальная гетеротопия",
+            label: 'субэпендимальная гетеротопия',
+            value: 'субэпендимальная гетеротопия'
           },
           {
-            label: "пахигирия",
-            value: "пахигирия",
+            label: 'пахигирия',
+            value: 'пахигирия'
           },
           {
-            label: "шизэнцефалия",
-            value: "шизэнцефалия",
+            label: 'шизэнцефалия',
+            value: 'шизэнцефалия'
           },
           {
-            label: "синдром двойной коры г/м",
-            value: "синдром двойной коры г/м",
+            label: 'синдром двойной коры г/м',
+            value: 'синдром двойной коры г/м'
           },
           {
-            label: "гетеротопия",
-            value: "гетеротопия",
-          },
-        ],
+            label: 'гетеротопия',
+            value: 'гетеротопия'
+          }
+        ]
       },
       {
-        label: "Киста",
-        value: "Киста",
+        label: 'Киста',
+        value: 'Киста',
         options: [
           {
-            label: "арахноидальная киста",
-            value: "арахноидальная киста",
+            label: 'арахноидальная киста',
+            value: 'арахноидальная киста'
           },
           {
-            label: "порэнцефалическая киста",
-            value: "порэнцефалическая киста",
+            label: 'порэнцефалическая киста',
+            value: 'порэнцефалическая киста'
           },
           {
-            label: "киста",
-            value: "киста",
-          },
-        ],
+            label: 'киста',
+            value: 'киста'
+          }
+        ]
       },
       {
-        label: "Энцефаломаляция",
-        value: "Энцефаломаляция",
+        label: 'Энцефаломаляция',
+        value: 'Энцефаломаляция',
         options: [
           {
-            label: "постаноксическая",
-            value: "постаноксическая",
+            label: 'постаноксическая',
+            value: 'постаноксическая'
           },
           {
-            label: "пострадиационная",
-            value: "пострадиационная",
+            label: 'пострадиационная',
+            value: 'пострадиационная'
           },
           {
-            label: "посттравматическая",
-            value: "посттравматическая",
+            label: 'посттравматическая',
+            value: 'посттравматическая'
           },
           {
-            label: "энцефаломаляция",
-            value: "энцефаломаляция",
+            label: 'энцефаломаляция',
+            value: 'энцефаломаляция'
           },
           {
-            label: "отделенные инфаркты",
-            value: "отделенные инфаркты",
-          },
-        ],
+            label: 'отделенные инфаркты',
+            value: 'отделенные инфаркты'
+          }
+        ]
       },
       {
-        label: "Атрофия",
-        value: "Атрофия",
+        label: 'Атрофия',
+        value: 'Атрофия',
         options: [
           {
-            label: "атрофия",
-            value: "атрофия",
+            label: 'атрофия',
+            value: 'атрофия'
           },
           {
-            label: "глиозы",
-            value: "глиозы",
-          },
-        ],
+            label: 'глиозы',
+            value: 'глиозы'
+          }
+        ]
       },
       {
-        label: "Пространственно-занимающее поражение",
-        value: "Пространственно-занимающее поражение",
+        label: 'Пространственно-занимающее поражение',
+        value: 'Пространственно-занимающее поражение',
         options: [
           {
-            label: "опухоли (первичная)",
-            value: "опухоли (первичная)",
+            label: 'опухоли (первичная)',
+            value: 'опухоли (первичная)'
           },
           {
-            label: "абсцесс",
-            value: "абсцесс",
+            label: 'абсцесс',
+            value: 'абсцесс'
           },
           {
-            label: "туберкулема",
-            value: "туберкулема",
+            label: 'туберкулема',
+            value: 'туберкулема'
           },
           {
-            label: "пространственно-занимающее поражение",
-            value: "пространственно-занимающее поражение",
+            label: 'пространственно-занимающее поражение',
+            value: 'пространственно-занимающее поражение'
           },
           {
-            label: "менингиома",
-            value: "менингиома",
+            label: 'менингиома',
+            value: 'менингиома'
           },
           {
-            label: "метастаз",
-            value: "метастаз",
-          },
-        ],
+            label: 'метастаз',
+            value: 'метастаз'
+          }
+        ]
       },
       {
-        label: "Демиелинизация",
-        value: "Демиелинизация",
+        label: 'Демиелинизация',
+        value: 'Демиелинизация',
         options: [
           {
-            label: "демиелинизация",
-            value: "демиелинизация",
+            label: 'демиелинизация',
+            value: 'демиелинизация'
           },
           {
-            label: "гипомиелинизация",
-            value: "гипомиелинизация",
-          },
-        ],
+            label: 'гипомиелинизация',
+            value: 'гипомиелинизация'
+          }
+        ]
       },
       {
-        label: "Агенизия мозолистое тело",
-        value: "Агенизия мозолистое тело",
+        label: 'Агенизия мозолистое тело',
+        value: 'Агенизия мозолистое тело'
       },
       {
-        label: "Гемангиома",
-        value: "Гемангиома",
+        label: 'Гемангиома',
+        value: 'Гемангиома'
       },
       {
-        label: "Эпендимома",
-        value: "Эпендимома",
+        label: 'Эпендимома',
+        value: 'Эпендимома'
       },
       {
-        label: "Мезиальный височный склероз (атрофия)",
-        value: "Мезиальный височный склероз (атрофия)",
+        label: 'Мезиальный височный склероз (атрофия)',
+        value: 'Мезиальный височный склероз (атрофия)'
       },
       {
-        label: "Внутричерепная кальцинация + атрофия",
-        value: "Внутричерепная кальцинация + атрофия",
+        label: 'Внутричерепная кальцинация + атрофия',
+        value: 'Внутричерепная кальцинация + атрофия'
       },
       {
-        label: "Норма",
-        value: "Норма",
+        label: 'Норма',
+        value: 'Норма'
       },
       {
-        label: "Гидроцефалия",
-        value: "Гидроцефалия ",
+        label: 'Гидроцефалия',
+        value: 'Гидроцефалия '
       },
       {
-        label: "Резидуальные очаги",
-        value: "Резидуальные очаги",
-      },
-    ],
-  },
-];
+        label: 'Резидуальные очаги',
+        value: 'Резидуальные очаги'
+      }
+    ]
+  }
+]
 
 const formFieldPETCTresult: FormField[] = [
   {
-    name: "localizationPETCT",
-    label: "Локализация",
-    type: "multioptions",
+    name: 'localizationPETCT',
+    label: 'Локализация',
+    type: 'multioptions',
     options: [
       {
-        label: "височная доля",
-        value: "височная доля",
+        label: 'височная доля',
+        value: 'височная доля',
         options: [
           {
-            label: "передняя",
-            value: "передняя",
+            label: 'передняя',
+            value: 'передняя'
           },
           {
-            label: "медиальная",
-            value: "медиальная",
+            label: 'медиальная',
+            value: 'медиальная'
           },
           {
-            label: "латеральная",
-            value: "латеральная",
-          },
-        ],
+            label: 'латеральная',
+            value: 'латеральная'
+          }
+        ]
       },
       {
-        label: "лобная доля",
-        value: "лобная доля",
+        label: 'лобная доля',
+        value: 'лобная доля'
       },
       {
-        label: "теменная доля",
-        value: "теменная доля",
+        label: 'теменная доля',
+        value: 'теменная доля'
       },
       {
-        label: "затылочная доля",
-        value: "затылочная доля",
+        label: 'затылочная доля',
+        value: 'затылочная доля'
       },
       {
-        label: "таламус",
-        value: "таламус",
+        label: 'таламус',
+        value: 'таламус'
       },
       {
-        label: "мозжечок",
-        value: "мозжечок",
+        label: 'мозжечок',
+        value: 'мозжечок'
       },
       {
-        label: "перивентрикулярная",
-        value: "перивентрикулярная",
+        label: 'перивентрикулярная',
+        value: 'перивентрикулярная'
       },
       {
-        label: "инсула",
-        value: "инсула",
+        label: 'инсула',
+        value: 'инсула'
       },
       {
-        label: "ствол мозга",
-        value: "ствол мозга",
+        label: 'ствол мозга',
+        value: 'ствол мозга'
       },
       {
-        label: "полушария г/м",
-        value: "полушария г/м",
+        label: 'полушария г/м',
+        value: 'полушария г/м'
       },
       {
-        label: "базальные ганглии",
-        value: "базальные ганглии",
+        label: 'базальные ганглии',
+        value: 'базальные ганглии'
       },
       {
-        label: "гипоталамус",
-        value: "гипоталамус",
+        label: 'гипоталамус',
+        value: 'гипоталамус'
       },
       {
-        label: "множественные узлы",
-        value: "множественные узлы",
-      },
-    ],
+        label: 'множественные узлы',
+        value: 'множественные узлы'
+      }
+    ]
   },
   {
-    name: "lateralizationPETCT",
-    label: "Латерализация",
-    type: "options",
+    name: 'lateralizationPETCT',
+    label: 'Латерализация',
+    type: 'options',
     options: [
       {
-        label: "справа",
-        value: "справа",
+        label: 'справа',
+        value: 'справа'
       },
       {
-        label: "слева",
-        value: "слева",
+        label: 'слева',
+        value: 'слева'
       },
       {
-        label: "билатеральный",
-        value: "билатеральный",
+        label: 'билатеральный',
+        value: 'билатеральный'
       },
       {
-        label: "сагиттальный",
-        value: "сагиттальный",
+        label: 'сагиттальный',
+        value: 'сагиттальный'
       },
       {
-        label: "не выполнено",
-        value: "не выполнено",
-      },
-    ],
+        label: 'не выполнено',
+        value: 'не выполнено'
+      }
+    ]
   },
   {
-    name: "resultPETCT",
-    label: "Заключение",
-    type: "options",
+    name: 'resultPETCT',
+    label: 'Заключение',
+    type: 'options',
     options: [
       {
-        label: "гиперметаболизм",
-        value: "гиперметаболизм",
+        label: 'гиперметаболизм',
+        value: 'гиперметаболизм'
       },
       {
-        label: "гипометаболизм",
-        value: "гипометаболизм",
+        label: 'гипометаболизм',
+        value: 'гипометаболизм'
       },
       {
-        label: "норма",
-        value: "норма",
-      },
-    ],
-  },
-];
+        label: 'норма',
+        value: 'норма'
+      }
+    ]
+  }
+]
 
 const formSchema: FormField[][] = [
   formFieldsPassportData,
@@ -4151,5 +4150,5 @@ const formSchema: FormField[][] = [
   formFieldAnticonvulsantDrugs,
   formFieldInstrumentalResearch,
   formFieldMRIResult,
-  formFieldPETCTresult,
-];
+  formFieldPETCTresult
+]

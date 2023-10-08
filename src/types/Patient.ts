@@ -1,94 +1,94 @@
-import { Multioption } from "./Multioption";
+import { Multioption } from './Multioption'
 
 export interface Patient {
-  id: number;
+  id: number
 
   // region Passport data
-  isResident: boolean;
+  isResident: boolean
 
-  nationality?: string;
+  nationality?: string
 
-  isMale?: boolean;
+  isMale?: boolean
 
-  isRightHanded?: boolean;
+  isRightHanded?: boolean
 
-  registrationNumber: string;
+  registrationNumber: string
 
-  firstName: string;
+  firstName: string
 
-  secondName: string;
+  secondName: string
 
-  patronymic?: string;
+  patronymic?: string
 
-  dateOfBirth: string;
+  dateOfBirth: string
 
-  iin: string;
+  iin: string
 
-  birthRegion?: string;
+  birthRegion?: string
 
-  birthAddress?: string;
+  birthAddress?: string
 
-  livingRegion?: string;
+  livingRegion?: string
 
-  livingAddress?: string;
+  livingAddress?: string
 
-  phoneNumber?: string;
+  phoneNumber?: string
 
-  educationProfession?: string;
+  educationProfession?: string
 
-  dispensaryRegistration?: string;
+  dispensaryRegistration?: string
 
-  workStatus?: string;
+  workStatus?: string
 
-  familyStatus?: string;
+  familyStatus?: string
 
-  isDriver?: boolean;
+  isDriver?: boolean
   // end region
 
   // region Anamnesis vitae
-  childCount?: number;
+  childCount?: number
 
-  pregnancyFeatures?: Multioption | string;
+  pregnancyFeatures?: Multioption | string
 
-  childBirthFeatures?: Multioption | string;
+  childBirthFeatures?: Multioption | string
 
-  afterBirthFeatures?: Multioption | string;
+  afterBirthFeatures?: Multioption | string
 
-  childEarlyDevelopment?: string;
+  childEarlyDevelopment?: string
   // end region
 
   // region Анамнез эпилепсии
-  isFS?: string;
+  isFS?: string
 
-  neuroinfection?: string;
+  neuroinfection?: string
 
-  ageOfTheFirstAttack?: Multioption | string;
+  ageOfTheFirstAttack?: Multioption | string
 
-  neonatalAndInfantAge?: Multioption | string | null;
+  neonatalAndInfantAge?: Multioption | string | null
 
-  childrenAndYouth?: Multioption | string;
+  childrenAndYouth?: Multioption | string
 
-  adultAndElderly?: Multioption | string;
+  adultAndElderly?: Multioption | string
 
-  actualSituationAdultAndElderly?: Multioption | string;
+  actualSituationAdultAndElderly?: Multioption | string
 
-  epilepsyType?: string;
+  epilepsyType?: string
 
-  icd?: string;
+  icd?: string
 
-  featuresOfSeizures?: Multioption | string;
+  featuresOfSeizures?: Multioption | string
 
-  withMotorSymptoms?: Multioption | string;
+  withMotorSymptoms?: Multioption | string
 
-  noMotorSymptoms?: Multioption | string;
+  noMotorSymptoms?: Multioption | string
   // end region
 
   // region Противосудорожные препараты (ПСП)
-  inTheDebut?: string;
+  inTheDebut?: string
 
-  followUpTherapy?: string;
+  followUpTherapy?: string
 
-  currentTherapy?: string;
+  currentTherapy?: string
 
   // valproates: [];
 
@@ -156,46 +156,46 @@ export interface Patient {
 
   // otherPreparates: [];
 
-  healTypes?: string;
+  healTypes?: string
 
-  effectivenessGrade?: string;
+  effectivenessGrade?: string
   // end region
 
   // region Фактическая ситуация
-  durationOfTheAttack?: string;
+  durationOfTheAttack?: string
   // end region
 
   // region Инструментальное исследование
-  typesOfEEG?: string;
+  typesOfEEG?: string
 
-  resultOfInterictalEEG?: Multioption | string;
+  resultOfInterictalEEG?: Multioption | string
 
-  prevalenceResultOfInterictalEEG?: Multioption | string;
+  prevalenceResultOfInterictalEEG?: Multioption | string
 
-  localization?: Multioption | string;
+  localization?: Multioption | string
 
-  types?: string;
+  types?: string
 
-  lateralization?: string;
+  lateralization?: string
   // end region
 
   // region Результаты МРТ
-  localizationnMRI?: Multioption | string;
+  localizationnMRI?: Multioption | string
 
-  lateralizationMRI?: string;
+  lateralizationMRI?: string
 
-  diagnosisMRI?: Multioption | string;
+  diagnosisMRI?: Multioption | string
   // end region
 
   // region ПЭТ КТ
-  localizationPETCT?: Multioption | string;
+  localizationPETCT?: Multioption | string
 
-  lateralizationPETCT?: string;
+  lateralizationPETCT?: string
 
-  resultPETCT?: string;
+  resultPETCT?: string
   // end region
 
-  lastEditingUser?: string;
+  lastEditingUser?: string
 
-  registrationDate?: string;
+  registrationDate?: string
 }
