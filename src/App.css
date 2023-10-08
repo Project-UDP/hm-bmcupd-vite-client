@@ -102,22 +102,6 @@
   }
 }
 
-/* button {
-    background: none;
-    border: none;
-    color: #ffffff;
-    font-weight: 900;
-    outline: none;
-    cursor: pointer;
-    border-radius: 8px;
-    padding: 4px 8px;
-  }
-  
-  button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  } */
-/* TODO: remove unneccesary classes */
-
 .modalling {
   position: fixed;
   z-index: 300;

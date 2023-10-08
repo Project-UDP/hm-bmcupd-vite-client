@@ -31,8 +31,7 @@ export const PatientCard = ({ patient }: Props): JSX.Element => {
         <strong>Пол:</strong> {patient.isMale ? 'Мужчина' : 'Женщина'}
       </p>
       <p>
-        <strong>Дата Рождения:</strong> {patient.dateOfBirth?.toString()}{' '}
-        {/* TODO: convert to readable */}
+        <strong>Дата Рождения:</strong> {patient.dateOfBirth}
       </p>
       <p>
         <strong>ID № (Номер регистрации):</strong> {patient.registrationNumber}

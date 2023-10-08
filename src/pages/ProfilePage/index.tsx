@@ -16,7 +16,7 @@ export const ProfilePage = (): JSX.Element => {
     speciality: '',
     role: 'USER'
   }
-  const profileUser = localStorageUtil.user.get() // TODO: not all is loaded data from localStorage
+  const profileUser = localStorageUtil.user.get()
   const [userForm, setUserForm] = useState<User>(emptyUser)
   const [users, setUsers] = useState<User[]>([])
   const [modal, setModal] = useState(false)
@@ -50,9 +50,9 @@ export const ProfilePage = (): JSX.Element => {
       return
     }
     try {
-      await api.admin.addUser(userForm) //TODO: refactor
+      await api.admin.addUser(userForm)
     } catch (error) {
-      toastUtils.error('Ошибка запроса или сервера')
+      toastUtils.error('Ошибка добавления пользователя')
       return
     }
     await loadUsers()

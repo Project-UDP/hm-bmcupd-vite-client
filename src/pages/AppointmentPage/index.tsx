@@ -9,12 +9,6 @@ import { api } from '../../api/api'
 import { objectUtils } from '../../utils/objectUtils'
 import dayjs from 'dayjs'
 
-const getMonthData = (value: Dayjs) => {
-  if (value.month() === 8) {
-    return 1394
-  }
-} //TODO: depricated
-
 export const AppointmentPage = (): JSX.Element => {
   const [appointments, setAppointments] = useState<Appointment[]>([])
 
@@ -65,16 +59,6 @@ export const AppointmentPage = (): JSX.Element => {
   }, [])
 
   // region: Calendar
-  const monthCellRender = (value: Dayjs) => {
-    const num = getMonthData(value)
-    return num ? (
-      <div className="notes-month">
-        <section>{num}</section>
-        <span>Backlog number</span>
-      </div>
-    ) : null
-  }
-
   const dateCellRender = (value: Dayjs) => {
     const appointmentBullets: any = []
     appointments?.forEach((item) => {
@@ -110,8 +94,9 @@ export const AppointmentPage = (): JSX.Element => {
   }
 
   const cellRender: CalendarProps<Dayjs>['cellRender'] = (current, info) => {
-    if (info.type === 'date') return dateCellRender(current)
-    if (info.type === 'month') return monthCellRender(current)
+    if (info.type === 'date') {
+      return dateCellRender(current)
+    }
     return info.originNode
   }
   // end region
@@ -160,8 +145,6 @@ const AddAppointmentModal = ({
     phoneNumber: ''
   })
 
-  console.log(Boolean(appointmentForm.dateTime))
-
   const handleModalClose = () => {
     setAppointmentForm({
       dateTime: '',
@@ -184,8 +167,7 @@ const AddAppointmentModal = ({
     newAppointment.doctorId = user.id
 
     try {
-      const r = await api.appointment.add(newAppointment)
-      console.log(r)
+      await api.appointment.add(newAppointment)
       const result = await api.appointment.getByDoctor(user.id!)
       setAppointments(result.data)
       handleModalClose()

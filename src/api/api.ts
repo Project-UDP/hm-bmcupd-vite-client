@@ -6,6 +6,7 @@ import { Patient } from '../types/Patient'
 import { FilterParameters } from '../types/FilterParameters'
 import { localStorageUtil } from '../utils/localStorageUtils'
 import { Appointment } from '../types/Appointment'
+import { objectUtils } from '../utils/objectUtils'
 
 const BASE_URL = 'http://localhost:8080/api/v1'
 const AUTH_URL = BASE_URL + '/auth'
@@ -108,7 +109,7 @@ export const api = {
     },
 
     add: async (payload: Patient): Promise<AxiosResponse<Patient, any>> => {
-      const patient = JSON.parse(JSON.stringify(payload)) //TODO: type it
+      const patient: Patient = objectUtils.deepCopy(payload)
       const user: User | null = localStorageUtil.user.get()
       patient.lastEditingUser = `${user?.secondname} ${user?.firstname} ${
         user?.patronymic || ''
@@ -118,7 +119,7 @@ export const api = {
     },
 
     edit: async (payload: Patient) => {
-      const patient = JSON.parse(JSON.stringify(payload)) //TODO: type it
+      const patient: Patient = objectUtils.deepCopy(payload) //TODO: obesrve behaviour with nested objects
       const user: User | null = localStorageUtil.user.get()
       patient.lastEditingUser = `${user?.secondname} ${user?.firstname} ${
         user?.patronymic || ''

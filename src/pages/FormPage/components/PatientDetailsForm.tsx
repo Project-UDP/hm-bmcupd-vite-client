@@ -180,12 +180,14 @@ export const PatientDetailsForm = ({
                         id={field.name}
                         name={box.name}
                         onChange={handleInput}
-                        checked={// @ts-ignore
-                        (
-                          formData[
-                            field.name as keyof typeof formData
-                          ] as Array<string | number>
-                        ).includes(box.name)}
+                        checked={
+                          // @ts-ignore
+                          (
+                            formData[
+                              field.name as keyof typeof formData
+                            ] as Array<string | number>
+                          ).includes(box.name)
+                        }
                       />
                       <label className="form-check-label" htmlFor={box.name}>
                         {box.label}
