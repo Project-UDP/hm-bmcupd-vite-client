@@ -6,6 +6,7 @@ import ReactDOMServer from 'react-dom/server'
 import html2pdf from 'html2pdf.js/dist/html2pdf.min'
 
 export const PatientPage = (): JSX.Element => {
+  //TODO: remove file later
   const { state } = useLocation()
   const patient: Patient = state
 
